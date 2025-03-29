@@ -1,0 +1,10 @@
+- name: Generate nerdctl bash completion script
+  ansible.builtin.shell: nerdctl completion bash
+  register: nerdctl_completion
+
+- name: Add nerdctl bash completion script to the system
+  ansible.builtin.copy:
+    content: "{{ nerdctl_completion.stdout }}"
+    dest: /usr/share/bash-completion/completions/nerdctl
+    mode: '0644'
+  become: true

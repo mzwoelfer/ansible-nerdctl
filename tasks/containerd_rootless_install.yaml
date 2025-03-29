@@ -1,0 +1,4 @@
+- name: Run containerd rootless setup as non-root user
+  ansible.builtin.command:
+    cmd: containerd-rootless-setuptool.sh install
+  become_user: "{{ ansible_user }}"

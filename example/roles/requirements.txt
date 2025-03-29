@@ -1,0 +1,4 @@
+- src: https://github.com/mzwoelfer/ansible-nerdctl.git
+  name: ansible-nerdctl
+  scm: git
+  version: main

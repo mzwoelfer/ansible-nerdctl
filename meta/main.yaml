@@ -1,0 +1,15 @@
+galaxy_info:
+  role_name: ansible-nerdctl
+  author: mzwoelfer
+  description: Installs latest (rootless) Nerdctl full (installs containerd) version on Debian from GitHub.
+  license: MIT
+  min_ansible_version: '2.9'
+  platform:
+    - name: Debian
+      versions:
+        - bookworm
+  galaxy_tags:
+    - nerdctl
+    - containerd
+
+
