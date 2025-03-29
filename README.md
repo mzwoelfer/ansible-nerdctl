@@ -7,16 +7,16 @@ Install the latest (rootless) Nerdctl full (installs containerd) version on a De
 Tested on:
 - Debian 12
 
-### Requirements
+## Requirements
 None.
 
-### Dependencies
+## Dependencies
 None.
 
-### Role Variable
+## Role Variable
 None.
 
-### Example Playbook
+## Example Playbook
 Installs latest rootless nerdctl + containerd version
 ```YAML
 - hosts: all
@@ -33,6 +33,6 @@ To install a specific version:
         nerdctl_version: "1.7.4"
 ```
 
-### LICENSE
+## LICENSE
 MIT
 
