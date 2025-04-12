@@ -1,7 +1,15 @@
+# Don't fail or chagne when nerdctl version throws an error
 - name: Check if nerdctl is already installed
   ansible.builtin.command: nerdctl --version
-  ignore_errors: true
+  register: nerdctl_installed_output
+  failed_when: false
+  changed_when: false
   become_user: "{{ ansible_user }}"
+
+- name: Extract installed version
+  set_fact: 
+    nerdctl_installed_version: "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
+  when: nerdctl_installed_output.rc == 0
 
 - name: Check latest nerdctl version from github
   ansible.builtin.uri:
@@ -15,13 +23,19 @@
     nerdctl_version: "{{ nerdctl_latest.json.tag_name | regex_replace('^v', '') }}"
   when: nerdctl_version == "latest"
 
+- name: Determine if nerdctl needs update
+  set_fact:
+    nerdctl_needs_update: "{{ nerdctl_installed_version is not defined or nerdctl_installed_version != nerdctl_version }}"
+
 - name: Set archive URLs
   set_fact: 
     nerdctl_archive: "nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
+  when: nerdctl_needs_update
 
 - name: Set nerdctl download URL
   set_fact:
     nerdctl_download_url: "https://github.com/containerd/nerdctl/releases/download/v{{ nerdctl_version }}/{{ nerdctl_archive }}"
+  when: nerdctl_needs_update
 
 - name: Download nerdctl if not already installed
   ansible.builtin.get_url:
@@ -30,6 +44,7 @@
     mode: 0755
     owner: "{{ ansible_user }}"
   become_user: "{{ ansible_user }}"
+  when: nerdctl_needs_update
 
   # TODO: Add progress bar every few seconds. Shows how far the download proceeded already!
 
@@ -39,5 +54,6 @@
     dest: /usr/local
     remote_src: true
   become: true
+  when: nerdctl_needs_update
 
   # TODO: tar file still on disk... remove?
