@@ -7,10 +7,6 @@ name: molecule testing
       - main
   pull_request:
 
-defaults:
-  run: 
-    working-directory: 'ansible-nerdctl'
-
 jobs: 
   molecule: 
     name: Molecule (Debian12)
