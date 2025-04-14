@@ -1,7 +1,6 @@
 - name: Enable lingering for user (required for rootless mode)
   ansible.builtin.command: "loginctl enable-linger {{ ansible_user }}"
   become: true
-  become_user: "{{ ansible_user }}"
 
 - name: Enable dbus user session
   ansible.builtin.systemd_service:
