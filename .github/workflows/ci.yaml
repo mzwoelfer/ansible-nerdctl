@@ -7,6 +7,10 @@ name: molecule testing
       - main
   pull_request:
 
+defaults:
+  run:
+    working-directory: .
+
 jobs: 
   molecule: 
     name: Molecule (Debian12)
