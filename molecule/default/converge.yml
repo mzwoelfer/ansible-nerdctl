@@ -15,6 +15,33 @@
         line: "user ALL=(ALL) NOPASSWD:ALL"
         validate: 'visudo -cf %s'
       become: true
+      
+    # - name: Enable lingering for 'user'
+    #   command: loginctl enable-linger user
+    #   become: true
+
+    - name: Manually create /run/user/1000 and set XDG_RUNTIME_DIR
+      ansible.builtin.file:
+        path: /run/user/1000
+        state: directory
+        owner: user
+        group: user
+        mode: '0700'
+      become: true
+
+    - name: Set XDG_RUNTIME_DIR for Molecule
+      ansible.builtin.set_fact:
+        xdg_runtime_dir: "/run/user/1000"
+
+    - name: Start dbus session as test user
+      become_user: user
+      environment:
+        XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
+      shell: |
+        eval "$(dbus-launch --sh-syntax)"
+        echo "export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" >> ~/.bashrc
+        echo "export DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" > ~/.dbus_env
+
 
     - name: Update apt cache
       apt:
