@@ -21,5 +21,8 @@ platforms:
 
 provisioner:
   name: ansible
+  config_options:
+    defaults:
+      roles_path: "../.."
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yaml}
