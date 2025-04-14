@@ -7,10 +7,6 @@ name: molecule testing
       - main
   pull_request:
 
-defaults:
-  run:
-    working-directory: .
-
 jobs: 
   molecule: 
     name: Molecule (Debian12)
@@ -19,8 +15,6 @@ jobs:
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
-        with: 
-          path: 'ansible-nerdctl'
 
       - name: Setup Python
         uses: actions/setup-python@v5
