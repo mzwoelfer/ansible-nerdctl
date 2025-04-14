@@ -1,0 +1,40 @@
+---
+- name: Verify Nerdctl Role
+  hosts: all
+  tasks:
+    - name: Verify Nerdctl is available
+      command: nerdctl version
+      register: nerdctl_version_result
+      changed_when: false
+      failed_when: nerdctl_version_result.rc != 0
+    
+    - name: Show Nerdctl version details
+      debug:
+        msg: >
+          Nerdctl version output:
+          {{ nerdctl_version_result.stdout_lines | join('\n') }}
+  
+    - name: Verify containerd is running of the user
+      command: systemctl is-active --user containerd
+      register: containerd_service_status
+      when: ansible_service_mgr == 'systemd'
+      changed_when: false
+      failed_when: containerd_service_status.stdout.strip() != "active"
+
+    - name: Display containerd status
+      debug:
+        msg: "Containerd service is {{ containerd_service_status.stdout.strip() }}"
+      when: ansible_service_mgr == 'systemd'
+      
+    # As described in Quickstart section of nerdctl releases
+    - name: Test nerdctl using nginx image
+      command: nerdctl run --rm -d --name nginx -p 8080:80 nginx:alpine
+      register: nerdctl_run_result
+      changed_when: true
+      failed_when: nerdctl_run_result.rc != 0
+
+    - name: Display test container output
+      debug:
+        msg: > 
+          Running 'nginx' container completed with output:
+          {{ nerdctl_run_result.stdout_lines | join('\n') }}
