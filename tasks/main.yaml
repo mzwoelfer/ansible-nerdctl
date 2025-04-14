@@ -1,1 +1,5 @@
+- name: DEBUG — main.yaml reached!
+  debug:
+    msg: "This is the main.yaml of the role"
+
 - include_tasks: "rootless_install.yaml"
