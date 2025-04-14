@@ -2,6 +2,20 @@
 - name: Converge
   hosts: all
   pre_tasks:
+    - name: Create test user 'user'
+      ansible.builtin.user:
+        name: user
+        shell: /bin/bash
+        create_home: true
+      become: true
+
+    - name: Add 'user' to sudoers (NOPASSWD)
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        line: "user ALL=(ALL) NOPASSWD:ALL"
+        validate: 'visudo -cf %s'
+      become: true
+
     - name: Update apt cache
       apt:
         update_cache: true

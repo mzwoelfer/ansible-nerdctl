@@ -16,7 +16,6 @@ platforms:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    user: user
     privileged: true
     pre_build_image: true
 
