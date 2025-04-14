@@ -36,3 +36,4 @@
 
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+      ansible_user: user

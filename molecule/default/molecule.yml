@@ -21,10 +21,5 @@ platforms:
 
 provisioner:
   name: ansible
-  inventory:
-    hosts:
-      all:
-        vars:
-          ansible_user: user
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
