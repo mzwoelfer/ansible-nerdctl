@@ -17,11 +17,20 @@
           {{ nerdctl_version_result.stdout_lines | join('\n') }}
   
     # As described in Quickstart section of nerdctl releases
+    - name: Read DBUS session file from remote host
+      ansible.builtin.slurp:
+        src: /home/user/.dbus_env
+      register: dbus_env_file
+
+    - name: Extract DBUS_SESSION_BUS_ADDRESS from .dbus_env
+      set_fact:
+        dbus_address: "{{ dbus_env_file['content'] | b64decode | regex_search('DBUS_SESSION_BUS_ADDRESS=(.*)', '\\1')"
+
     - name: Test nerdctl using nginx image
       command: nerdctl run -d --name nginx -p 8080:80 nginx:alpine
       environment:
         XDG_RUNTIME_DIR: "/run/user/1000"
-        DBUS_SESSION_BUS_ADDRESS: "{{ lookup('file', '/home/user/.dbus_env') | regex_search('DBUS_SESSION_BUS_ADDRESS=(.*)', '\\1') }}"
+        DBUS_SESSION_BUS_ADDRESS: "{{ dbus_address }}"
       register: nerdctl_run_result
       changed_when: true
       failed_when: nerdctl_run_result.rc != 0
