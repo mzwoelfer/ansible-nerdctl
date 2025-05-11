@@ -64,4 +64,6 @@
 
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
+      vars:
+        nerdctl_rootless_install: false
       ansible_user: user
