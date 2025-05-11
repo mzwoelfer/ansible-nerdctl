@@ -42,6 +42,13 @@
       set_fact:
         xdg_runtime_dir: "/run/user/1000"
 
+    - name: Check if DBUS session is already in .bashrc
+      become_user: user
+      ansible.builtin.shell: grep -q "DBUS_SESSION_BUS_ADDRESS" ~/.bashrc
+      register: dbus_bashrc_check
+      failed_when: false
+      changed_when: false
+
     - name: Bootstrap dbus session and store env
       become_user: user
       shell: |
@@ -50,6 +57,7 @@
         echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" > ~/.dbus_env
       environment:
         XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
+      when: dbus_bashrc_check.rc != 0
 
     - name: Update apt cache
       apt:
