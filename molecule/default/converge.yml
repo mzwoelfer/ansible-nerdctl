@@ -19,15 +19,15 @@
       become: true
 
     - name: Check if lingering is already enabled
-      command: loginctl show-user user -p Linger
-      register: linger_status
-      changed_when: false
+      ansible.builtin.stat:
+        path: "/var/lib/systemd/linger/user"
+      register: linger_file
       become: true
 
     - name: Enable lingering for 'user'
       command: loginctl enable-linger user
       become: true
-      when: '"Linger=no" in linger_status.stdout'
+      when: not linger_file.stat.exists
 
     - name: Create /run/user/1000 directory
       ansible.builtin.file:
