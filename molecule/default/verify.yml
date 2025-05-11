@@ -19,6 +19,9 @@
       register: containerd_service_status
       when: ansible_service_mgr == 'systemd'
       changed_when: false
+      become_user: user
+      environment:
+        XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
       failed_when: containerd_service_status.stdout.strip() != "active"
 
     - name: Display containerd status
