@@ -6,6 +6,7 @@ name: molecule testing
     branches:
       - main
   pull_request:
+  workflow_dispatch:
 
 defaults:
   run:
