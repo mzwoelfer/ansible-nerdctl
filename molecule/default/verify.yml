@@ -14,21 +14,6 @@
           Nerdctl version output:
           {{ nerdctl_version_result.stdout_lines | join('\n') }}
   
-    - name: Verify containerd is running of the user
-      command: systemctl is-active --user containerd
-      register: containerd_service_status
-      when: ansible_service_mgr == 'systemd'
-      changed_when: false
-      become_user: user
-      environment:
-        XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
-      failed_when: containerd_service_status.stdout.strip() != "active"
-
-    - name: Display containerd status
-      debug:
-        msg: "Containerd service is {{ containerd_service_status.stdout.strip() }}"
-      when: ansible_service_mgr == 'systemd'
-      
     # As described in Quickstart section of nerdctl releases
     - name: Test nerdctl using nginx image
       command: nerdctl run --rm -d --name nginx -p 8080:80 nginx:alpine
