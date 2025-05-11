@@ -24,7 +24,7 @@
 
     - name: Extract DBUS_SESSION_BUS_ADDRESS from .dbus_env
       set_fact:
-        dbus_address: "{{ dbus_env_file['content'] | b64decode | regex_search('DBUS_SESSION_BUS_ADDRESS=(.*)', '\\1')"
+        dbus_address: "{{ dbus_env_file['content'] | b64decode | regex_search('DBUS_SESSION_BUS_ADDRESS=(.*)', '\\1') }}"
 
     - name: Test nerdctl using nginx image
       command: nerdctl run -d --name nginx -p 8080:80 nginx:alpine
