@@ -1,6 +1,14 @@
+- name: Check existing nerdctl completion script
+  ansible.builtin.slurp:
+    src: /usr/share/bash-completion/completions/nerdctl
+  register: existing_completion
+  ignore_errors: true
+  become: true
+
 - name: Generate nerdctl bash completion script
   ansible.builtin.shell: nerdctl completion bash
   register: nerdctl_completion
+  changed_when: false
 
 - name: Add nerdctl bash completion script to the system
   ansible.builtin.copy:
@@ -8,3 +16,4 @@
     dest: /usr/share/bash-completion/completions/nerdctl
     mode: '0644'
   become: true
+  when: existing_completion.content | b64decode != nerdctl_completion.stdout
