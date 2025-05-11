@@ -18,9 +18,16 @@
         validate: 'visudo -cf %s'
       become: true
 
+    - name: Check if lingering is already enabled
+      command: loginctl show-user user -p Linger
+      register: linger_status
+      changed_when: false
+      become: true
+
     - name: Enable lingering for 'user'
       command: loginctl enable-linger user
       become: true
+      when: '"Linger=no" in linger_status.stdout'
 
     - name: Create /run/user/1000 directory
       ansible.builtin.file:
