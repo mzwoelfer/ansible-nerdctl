@@ -4,7 +4,7 @@
   register: nerdctl_installed_output
   failed_when: false
   changed_when: false
-  become_user: "{{ ansible_user }}"
+  become_user: "{{ nerdctl_user }}"
 
 - name: Extract installed version
   set_fact: 
@@ -40,17 +40,17 @@
 - name: Download nerdctl if not already installed
   ansible.builtin.get_url:
     url: "{{ nerdctl_download_url }}"
-    dest: "/home/{{ ansible_user }}/{{ nerdctl_archive }}"
+    dest: "/home/{{ nerdctl_user }}/{{ nerdctl_archive }}"
     mode: 0755
-    owner: "{{ ansible_user }}"
-  become_user: "{{ ansible_user }}"
+    owner: "{{ nerdctl_user }}"
+  become_user: "{{ nerdctl_user }}"
   when: nerdctl_needs_update
 
   # TODO: Add progress bar every few seconds. Shows how far the download proceeded already!
 
 - name: Extract nerdctl to /usr/local/
   ansible.builtin.unarchive:
-    src: "/home/{{ ansible_user }}/{{ nerdctl_archive }}"
+    src: "/home/{{ nerdctl_user }}/{{ nerdctl_archive }}"
     dest: /usr/local
     remote_src: true
   become: true
