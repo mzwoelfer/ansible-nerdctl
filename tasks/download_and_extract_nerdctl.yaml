@@ -40,7 +40,7 @@
 - name: Download nerdctl if not already installed
   ansible.builtin.get_url:
     url: "{{ nerdctl_download_url }}"
-    dest: "/home/{{ nerdctl_user }}/{{ nerdctl_archive }}"
+    dest: "/tmp/{{ nerdctl_archive }}"
     mode: 0755
     owner: "{{ nerdctl_user }}"
   become_user: "{{ nerdctl_user }}"
@@ -50,7 +50,7 @@
 
 - name: Extract nerdctl to /usr/local/
   ansible.builtin.unarchive:
-    src: "/home/{{ nerdctl_user }}/{{ nerdctl_archive }}"
+    src: "/tmp/{{ nerdctl_archive }}"
     dest: /usr/local
     remote_src: true
   become: true
