@@ -33,6 +33,26 @@ To install a specific version:
         nerdctl_version: "1.7.4"
 ```
 
+
+## Testing
+1. Install requirements
+```SHELL
+sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst
+```
+
+2. Setup python environment: 
+```SHELL
+python3 -m venv Env
+source Env/bin/activate
+
+pip install molecule 
+```
+
+3. Create molecule scenario
+```SHELL
+
+```
+
 ## LICENSE
 MIT
 
