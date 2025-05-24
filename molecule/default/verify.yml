@@ -28,7 +28,6 @@
 
     - name: Test nerdctl using nginx image
       command: nerdctl run -d --name nginx -p 8080:80 nginx:alpine
-      become: true
       register: nerdctl_run_result
       changed_when: true
       failed_when: nerdctl_run_result.rc != 0
