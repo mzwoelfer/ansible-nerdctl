@@ -16,9 +16,13 @@
           {{ nerdctl_version_result.stdout_lines | join('\n') }}
   
     # As described in Quickstart section of nerdctl releases
+    - name: Get home directory
+      ansible.builtin.shell: "getent passwd {{ nerdctl_user }} | cut -d: -f6"
+      register: nerdctl_user_homedir
+
     - name: Read DBUS session file from remote host
       ansible.builtin.slurp:
-        src: /home/user/.dbus_env
+        src: "{{ nerdctl_user_homedir }}/.dbus_env"
       register: dbus_env_file
 
     - name: Extract DBUS_SESSION_BUS_ADDRESS from .dbus_env
