@@ -14,15 +14,28 @@
         msg: >
           Nerdctl version output:
           {{ nerdctl_version_result.stdout_lines | join('\n') }}
-  
-    - name: Test nerdctl using nginx image
-      command: nerdctl run -d --name nginx -p 8080:80 nginx:alpine
+
+    - name: Pull the 'hello-world' image
+      command: nerdctl pull hello-world
+      register: nerdctl_pull_result
+      changed_when: true
+      failed_when: nerdctl_pull_result.rc != 0
+
+    - name: Show result of pulling the 'hello-world' image
+      debug:
+        msg: >
+          Pulling 'hello-world' completed with output:
+          {{ nerdctl_pull_result.stdout_lines | join('\n') }}
+
+    - name: Run a test container (hello-world)
+      command: nerdctl run --rm hello-world
       register: nerdctl_run_result
       changed_when: true
       failed_when: nerdctl_run_result.rc != 0
 
     - name: Display test container output
       debug:
-        msg: > 
-          Running 'nginx' container completed with output:
+        msg: >
+          Running 'hello-world' container completed with output:
           {{ nerdctl_run_result.stdout_lines | join('\n') }}
+  
