@@ -1,6 +1,7 @@
 - name: Generate nerdctl bash completion script
   ansible.builtin.shell: nerdctl completion bash
   register: nerdctl_completion
+  changed_when: false
 
 - name: Add nerdctl bash completion script to the system
   ansible.builtin.copy:

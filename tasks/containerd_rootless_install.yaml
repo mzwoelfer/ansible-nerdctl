@@ -1,4 +1,14 @@
 - name: Run containerd rootless setup as non-root user
   ansible.builtin.command:
     cmd: containerd-rootless-setuptool.sh install
-  become_user: "{{ ansible_user }}"
+  become_user: "{{ nerdctl_user }}"
+  environment:
+    XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
+  when: nerdctl_rootless_install
+
+- name: Enable and start containerd for rootful nerdctl
+  ansible.builtin.systemd:
+    name: containerd
+    enabled: true
+    state: started
+  when: not nerdctl_rootless_install

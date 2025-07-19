@@ -1,0 +1,38 @@
+---
+name: molecule testing
+
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: .
+
+jobs: 
+  molecule: 
+    name: Molecule (Debian12)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Molecule + dependencies
+        run: |
+          pip install ansible molecule molecule-plugins[docker] docker
+
+      - name: Run Molecule test
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+          MOLECULE_DISTRO: "debian12"
