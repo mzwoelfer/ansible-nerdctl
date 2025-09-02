@@ -1,6 +1,6 @@
 ---
 nerdctl_version: "latest"
 nerdctl_latest_api_url: "https://api.github.com/repos/containerd/nerdctl/releases/latest"
-nerdctl_rootless_install: true
+nerdctl_rootless: true
 
 nerdctl_user: "{{ ansible_user_id | default(ansible_user) }}"
