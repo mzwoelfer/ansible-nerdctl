@@ -38,10 +38,54 @@
         mode: '0644'
 
     - name: Reload systemd daemon to apply new cgroup delegation
-      command: systemctl daemon-reexec
-      args:
-        warn: false
+      ansible.builtin.systemd_service:
+        daemon_reexec: true
 
   when:
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
+
+- name: Configure rootless fuse-overlayfs for containerd on Debian11
+  become: true
+  block:
+    - name: containerd config directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/.config/containerd"
+        state: directory
+        mode: 0755
+        owner: "{{ nerdctl_user }}"
+        group: "{{ ansible_user_gid }}"
+
+    - name: Add fuse-overlayfs proxy plugin to containerd config
+      blockinfile:
+        path: "{{ ansible_env.HOME }}/.config/containerd/config.toml"
+        block: |
+          [proxy_plugins]
+            [proxy_plugins."fuse-overlayfs"]
+              type = "snapshot"
+              address = "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
+        marker: "### BEGIN FUSE OVERLAYFS ###"
+        create: yes
+        owner: "{{ nerdctl_user }}"
+        group: "{{ ansible_user_gid }}"
+        mode: 0644
+
+    - name: Restart rootless containerd service for user
+      become: false
+      ansible.builtin.systemd_service:
+        name: containerd.service
+        scope: user
+        state: restarted
+        daemon_reload: true
+
+    - name: Set environment variable for fuse-overlayfs snapshotter
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.profile"
+        line: 'export CONTAINERD_SNAPSHOTTER="fuse-overlayfs"'
+        create: true
+        state: present
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "11"
+
+
