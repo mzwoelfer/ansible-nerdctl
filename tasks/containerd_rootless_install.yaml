@@ -11,7 +11,7 @@
   when: 
     - nerdctl_rootless_install
     - ansible_distribution == "Debian"
-    - ansible_distribution_version == "11"
+    - ansible_distribution_major_version == "11"
 
 - name: Enable and start containerd for rootful nerdctl
   ansible.builtin.systemd:
@@ -19,3 +19,29 @@
     enabled: true
     state: started
   when: not nerdctl_rootless_install
+
+- name: Ensure cgroup controllers are delegated for user services (Debian 11)
+  become: true
+  block:
+    - name: Create systemd override directory for user@.service
+      file:
+        path: /etc/systemd/system/user@.service.d
+        state: directory
+        mode: '0755'
+
+    - name: Create delegate.conf to enable cpu, cpuset, io delegation
+      copy:
+        dest: /etc/systemd/system/user@.service.d/delegate.conf
+        content: |
+          [Service]
+          Delegate=cpu cpuset io memory pids
+        mode: '0644'
+
+    - name: Reload systemd daemon to apply new cgroup delegation
+      command: systemctl daemon-reexec
+      args:
+        warn: false
+
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "11"
