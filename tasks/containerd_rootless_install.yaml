@@ -4,6 +4,15 @@
   become_user: "{{ nerdctl_user }}"
   when: nerdctl_rootless_install
 
+- name: Install fuse-overlayfs for Debian11 as non-root user
+  ansible.builtin.command:
+    cmd: containerd-rootless-setuptool.sh install-fuse-overlayfs
+  become_user: "{{ nerdctl_user }}"
+  when: 
+    - nerdctl_rootless_install
+    - ansible_distribution == "Debian"
+    - ansible_distribution_version == "11"
+
 - name: Enable and start containerd for rootful nerdctl
   ansible.builtin.systemd:
     name: containerd
