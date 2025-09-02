@@ -11,3 +11,20 @@
     state: present
   become: true
 
+- name: Install fuse3 for rootless nerdctl on Debian11
+  ansible.builtin.apt:
+    name: fuse3
+    state: present
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "11"
+
+- name: Symlink mount.fuse3 into default Debian11 $PATH
+  file: 
+    src: /sbin/mount.fuse3
+    dest: /usr/local/bin/mount.fuse3
+    state: link
+    force: true
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_major_version == "11"
