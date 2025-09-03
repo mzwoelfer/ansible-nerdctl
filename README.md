@@ -5,7 +5,11 @@ Install the latest rootless Nerdctl full (installs containerd) version on a Debi
 [Nerdctl](https://github.com/containerd/nerdctl): contaiNERD CTL - Docker-compatible CLI for containerd.
 
 Tested on:
-- Debian 11/12/13
+- [X] Debian 11/12/13
+
+Under development:
+- [ ] RHEL 8/9/10 support (Testing on Rocky Linux)
+- [ ] rootfull install
 
 ## Requirements
 None.
