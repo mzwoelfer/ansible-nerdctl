@@ -69,14 +69,7 @@
         owner: "{{ nerdctl_user }}"
         group: "{{ ansible_user_gid }}"
         mode: 0644
-
-    - name: Restart rootless containerd service for user
-      become: false
-      ansible.builtin.systemd_service:
-        name: containerd.service
-        scope: user
-        state: restarted
-        daemon_reload: true
+      notify: Restart rootless containerd user service
 
     - name: Set environment variable for fuse-overlayfs snapshotter
       lineinfile:
