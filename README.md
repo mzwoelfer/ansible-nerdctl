@@ -10,6 +10,7 @@ Tested on:
 Under development:
 - [ ] RHEL 8/9/10 support (Testing on Rocky Linux)
 - [ ] rootfull install
+- [ ] Own path for containerd tarball
 
 ## Requirements
 None.
