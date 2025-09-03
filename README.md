@@ -1,11 +1,16 @@
 # Ansible Role: Install Nerdctl
 
-Install the latest (rootless) Nerdctl full (installs containerd) version on a Debian system from GitHub.
+Install the latest rootless Nerdctl full (installs containerd) version on a Debian system from GitHub.
 
-[Nerdctl](https://github.com/containerd/nerdctl): contaiNERD CTL - Docker-compatible CLi for containerd.
+[Nerdctl](https://github.com/containerd/nerdctl): contaiNERD CTL - Docker-compatible CLI for containerd.
 
 Tested on:
-- Debian 12
+- [X] Debian 11/12/13
+
+Under development:
+- [ ] RHEL 8/9/10 support (Testing on Rocky Linux)
+- [ ] rootfull install
+- [ ] Own path for containerd tarball
 
 ## Requirements
 None.

@@ -2,14 +2,14 @@
   ansible.builtin.command:
     cmd: containerd-rootless-setuptool.sh install
   become_user: "{{ nerdctl_user }}"
-  when: nerdctl_rootless_install
+  when: nerdctl_rootless
 
 - name: Install fuse-overlayfs for Debian11 as non-root user
   ansible.builtin.command:
     cmd: containerd-rootless-setuptool.sh install-fuse-overlayfs
   become_user: "{{ nerdctl_user }}"
   when: 
-    - nerdctl_rootless_install
+    - nerdctl_rootless
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
 
@@ -18,7 +18,7 @@
     name: containerd
     enabled: true
     state: started
-  when: not nerdctl_rootless_install
+  when: not nerdctl_rootless
 
 - name: Ensure cgroup controllers are delegated for user services (Debian 11)
   become: true
@@ -69,14 +69,7 @@
         owner: "{{ nerdctl_user }}"
         group: "{{ ansible_user_gid }}"
         mode: 0644
-
-    - name: Restart rootless containerd service for user
-      become: false
-      ansible.builtin.systemd_service:
-        name: containerd.service
-        scope: user
-        state: restarted
-        daemon_reload: true
+      notify: Restart rootless containerd user service
 
     - name: Set environment variable for fuse-overlayfs snapshotter
       lineinfile:
