@@ -9,7 +9,7 @@
         - ip6tables
       register: iptables_check
 
-    - name: Create symlink for iptables and ip6tables for path in $PATH
+    - name: Create symlink for iptables and ip6tables for path in default Debian $PATH
       file:
         src: "/usr/sbin/{{ item.item }}"
         dest: "/usr/local/bin/{{ item.item }}"
