@@ -1,16 +1,42 @@
-# Install required packages
-# Setup iptables symlink into default $PATH
-# Setup rootless containers
-# Setup Debian11 rootless quirks (fuse-overlay + cgroups)
-# Setup Debian11 cgroup delegation
-# Setup rootful containerd
-# Download nerdctl from github
-# Enable buildkit
-# Enable bash completion
-#
-- include_tasks: install_required_packages.yaml
-- include_tasks: symlink_iptables_to_path.yaml
-- include_tasks: rootful_user_session.yaml
+- include_tasks: setup_system.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
-- include_tasks: rootless_install.yaml
-- include_tasks: enable_bash_completion.yaml
+
+- name: Rootless install
+  when: nerdctl_rootless
+  block:
+    - name: Run containerd rootless setup as non-root user
+      ansible.builtin.command:
+        cmd: containerd-rootless-setuptool.sh install
+      become_user: "{{ nerdctl_user }}"
+      when: nerdctl_rootless
+
+    - name: Install overlayfs quirks for Debian11
+      ansible.builtin.include_tasks: rootless_debian11_quirks.yaml
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution_major_version == "11"
+
+- name: Rootful install
+  ansible.builtin.systemd:
+    name: containerd
+    enabled: true
+    state: started
+  when: not nerdctl_rootless
+
+- name: Enable bash completion
+  block:
+    - name: Generate nerdctl bash completion script
+      ansible.builtin.shell: nerdctl completion bash
+      register: nerdctl_completion
+      changed_when: false
+
+    - name: Add nerdctl bash completion script to the system
+      ansible.builtin.copy:
+        content: "{{ nerdctl_completion.stdout }}"
+        dest: /usr/share/bash-completion/completions/nerdctl
+        mode: '0644'
+      become: true
+
+- name: Enable buildkit
+  ansible.builtin.shell: containerd-rootless-setuptool.sh install-buildkit
+  become_user: "{{ nerdctl_user }}"

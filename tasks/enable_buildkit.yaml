@@ -1,4 +1,0 @@
----
-- name: Enable buildkit
-  ansible.builtin.shell: containerd-rootless-setuptool.sh install-buildkit
-  become_user: "{{ nerdctl_user }}"
