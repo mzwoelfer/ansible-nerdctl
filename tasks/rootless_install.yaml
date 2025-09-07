@@ -10,11 +10,4 @@
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
 
-- name: Enable and start containerd for rootful nerdctl
-  ansible.builtin.systemd:
-    name: containerd
-    enabled: true
-    state: started
-  when: not nerdctl_rootless
-
 
