@@ -1,4 +1,14 @@
-- include_tasks: install_required_apt_packages.yaml
+# Install required packages
+# Setup iptables symlink into default $PATH
+# Setup rootless containers
+# Setup Debian11 rootless quirks (fuse-overlay + cgroups)
+# Setup Debian11 cgroup delegation
+# Setup rootful containerd
+# Download nerdctl from github
+# Enable buildkit
+# Enable bash completion
+#
+- include_tasks: install_required_packages.yaml
 - include_tasks: create_iptables_symlink.yaml
 - include_tasks: enable_rootless_containers.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
