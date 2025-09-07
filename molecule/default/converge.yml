@@ -48,7 +48,7 @@
 
     - name: Create /run/user/1000 directory
       ansible.builtin.file:
-        path: "{{ xdg_runetime_dir }}"
+        path: "{{ xdg_runtime_dir }}"
         state: directory
         owner: nerd
         group: nerd
