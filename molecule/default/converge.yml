@@ -11,6 +11,15 @@
         create_home: true
       become: true
 
+    - name: Get UID of nerd rootless user
+      ansible.builtin.user:
+        name: nerd
+      register: nerd_user_info
+
+    - name: Set xdg_runtime_dir fact
+      set_fact:
+        xdg_runtime_dir: "/run/user/{{ nerdctl_user_info.uid }}"
+
     - name: Allow passwordless sudo for nerd user
       ansible.builtin.copy:
         dest: /etc/sudoers.d/nerd
@@ -29,18 +38,22 @@
       become: true
       when: not linger_file.stat.exists
 
+    - name: Start user systemd session for nerd
+      become_user: nerd
+      ansible.builtin.shell: |
+        export XDG_RUNTIME_DIR=/run/user/$(id -u)
+        systemd --user &
+      async: 0
+      poll: 0
+
     - name: Create /run/user/1000 directory
       ansible.builtin.file:
-        path: "/run/nerd/1000"
+        path: "{{ xdg_runetime_dir }}"
         state: directory
         owner: nerd
         group: nerd
         mode: '0700'
       become: true
-
-    - name: Set XDG_RUNTIME_DIR for Molecule
-      set_fact:
-        xdg_runtime_dir: "/run/nerd/1000"
 
     - name: Check if DBUS session is already in .bashrc
       become_user: nerd
