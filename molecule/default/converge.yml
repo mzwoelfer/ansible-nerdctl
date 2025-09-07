@@ -18,7 +18,7 @@
 
     - name: Set xdg_runtime_dir fact
       set_fact:
-        xdg_runtime_dir: "/run/user/{{ nerdctl_user_info.uid }}"
+        xdg_runtime_dir: "/run/user/{{ nerd_user_info.uid }}"
 
     - name: Allow passwordless sudo for nerd user
       ansible.builtin.copy:
