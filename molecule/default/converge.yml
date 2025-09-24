@@ -40,11 +40,11 @@
 
     - name: Enable lingering
       become: true
-      command: loginctl enable-linger nerdctl_user
+      command: loginctl enable-linger nerd
 
-    - name: Start user systemd for nerdctl_user
+    - name: Start user systemd for nerd
       become: true
-      become_user: nerdctl_user
+      become_user: nerd
       shell: |
         systemd-run --user --scope echo "user systemd running"
       args:
