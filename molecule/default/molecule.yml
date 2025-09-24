@@ -10,21 +10,15 @@ driver:
   name: docker
 
 platforms:
-  - name: debian12
-    image: trfore/docker-debian12-systemd
-    command: /sbin/init
-    tmpfs:
-      - /run
-      - /tmp
+  - name: instance
+    image: "geerlingguy/docker-debian12-ansible:latest"
+    command: "/sbin/init"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
     privileged: true
     pre_build_image: true
-    capabilities:
-      - SYS_ADMIN
-    environment:
-      container: docker
+    ansible_user: nerd
 
 provisioner:
   name: ansible

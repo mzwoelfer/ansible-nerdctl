@@ -4,24 +4,12 @@
   become: true
 
   pre_tasks:
-    - name: Ensure systemd and dependencies are installed
-      ansible.builtin.apt:
-        name:
-          - systemd
-          - systemd-sysv
-          - sudo
-          - dbus
-          - libpam-systemd
-        state: present
-        update_cache: true
-
     - name: Create test user 
       ansible.builtin.user:
         name: nerd
-        groups: sudo
-        append: true
         shell: /bin/bash
         create_home: true
+      become: true
 
     - name: Get UID of nerd rootless user
       ansible.builtin.user:
@@ -37,6 +25,7 @@
         dest: /etc/sudoers.d/nerd
         content: "nerd ALL=(ALL) NOPASSWD:ALL\n"
         mode: '0440'
+      become: true
 
     - name: Check if lingering is already enabled
       ansible.builtin.stat:
