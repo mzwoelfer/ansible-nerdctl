@@ -21,6 +21,10 @@ platforms:
     cgroupns_mode: host
     privileged: true
     pre_build_image: true
+    capabilities:
+      - SYS_ADMIN
+    environment:
+      container: docker
 
 provisioner:
   name: ansible
