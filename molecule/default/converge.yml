@@ -4,6 +4,17 @@
   become: true
 
   pre_tasks:
+    - name: Ensure systemd and dependencies are installed
+      ansible.builtin.apt:
+        name:
+          - systemd
+          - systemd-sysv
+          - sudo
+          - dbus
+          - libpam-systemd
+        state: present
+        update_cache: true
+
     - name: Create test user 
       ansible.builtin.user:
         name: nerd
@@ -26,6 +37,19 @@
         dest: /etc/sudoers.d/nerd
         content: "nerd ALL=(ALL) NOPASSWD:ALL\n"
         mode: '0440'
+
+    - name: Enable lingering
+      become: true
+      command: loginctl enable-linger nerdctl_user
+
+    - name: Start user systemd for nerdctl_user
+      become: true
+      become_user: nerdctl_user
+      shell: |
+        systemd-run --user --scope echo "user systemd running"
+      args:
+        executable: /bin/bash
+      changed_when: false
 
 #     - name: Check if lingering is already enabled
 #       ansible.builtin.stat:
