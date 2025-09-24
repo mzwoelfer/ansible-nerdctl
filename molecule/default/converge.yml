@@ -4,66 +4,53 @@
   become: true
 
   pre_tasks:
-    - name: Create test user 
+    - name: Create test user '{{ nerdctl_user }}'
       ansible.builtin.user:
-        name: nerd
+        name: "{{ nerdctl_user }}"
         shell: /bin/bash
         create_home: true
       become: true
 
-    - name: Get UID of nerd rootless user
-      ansible.builtin.user:
-        name: nerd
-      register: nerd_user_info
-
-    - name: Set xdg_runtime_dir fact
-      set_fact:
-        xdg_runtime_dir: "/run/user/{{ nerd_user_info.uid }}"
-
-    - name: Allow passwordless sudo for nerd user
-      ansible.builtin.copy:
-        dest: /etc/sudoers.d/nerd
-        content: "nerd ALL=(ALL) NOPASSWD:ALL\n"
-        mode: '0440'
+    - name: Add 'user' to sudoers (NOPASSWD)
+      ansible.builtin.lineinfile:
+        path: /etc/sudoers
+        line: "{{ nerdctl_user }} ALL=(ALL) NOPASSWD:ALL"
+        validate: 'visudo -cf %s'
       become: true
 
     - name: Check if lingering is already enabled
       ansible.builtin.stat:
-        path: "/var/lib/systemd/linger/nerd"
+        path: "/var/lib/systemd/linger/{{ nerdctl_user }}"
       register: linger_file
       become: true
 
-    - name: Enable lingering for 'nerd'
-      command: "loginctl enable-linger nerd"
+    - name: Enable lingering for '{{ nerdctl_user }}'
+      command: "loginctl enable-linger {{ nerdctl_user }}"
       become: true
       when: not linger_file.stat.exists
 
-    - name: Start user systemd session for nerd
-      become_user: nerd
-      ansible.builtin.shell: |
-        export XDG_RUNTIME_DIR=/run/user/$(id -u)
-        systemd --user &
-      async: 0
-      poll: 0
-
     - name: Create /run/user/1000 directory
       ansible.builtin.file:
-        path: "{{ xdg_runtime_dir }}"
+        path: "/run/{{ nerdctl_user }}/1000"
         state: directory
-        owner: nerd
-        group: nerd
+        owner: "{{ nerdctl_user }}"
+        group: "{{ nerdctl_user }}"
         mode: '0700'
       become: true
 
+    - name: Set XDG_RUNTIME_DIR for Molecule
+      set_fact:
+        xdg_runtime_dir: "/run/{{ nerdctl_user }}/1000"
+
     - name: Check if DBUS session is already in .bashrc
-      become_user: nerd
+      become_user: "{{ nerdctl_user }}"
       ansible.builtin.shell: grep -q "DBUS_SESSION_BUS_ADDRESS" ~/.bashrc
       register: dbus_bashrc_check
       failed_when: false
       changed_when: false
 
     - name: Bootstrap dbus session and store env
-      become_user: nerd
+      become_user: "{{ nerdctl_user }}"
       shell: |
         eval $(dbus-launch --sh-syntax)
         echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >> ~/.bashrc
@@ -77,7 +64,6 @@
         update_cache: true
         cache_valid_time: 600
       when: ansible_os_family == 'Debian'
-      become: true
 
     - name: Wait for systemd to be ready
       command: systemctl is-system-running
@@ -94,4 +80,4 @@
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
       vars:
-        nerdctl_user: nerd
+        nerdctl_rootless: false
