@@ -28,9 +28,9 @@
         name: nerd
       register: nerd_user_info
 
-#     - name: Set xdg_runtime_dir fact
-#       set_fact:
-#         xdg_runtime_dir: "/run/user/{{ nerd_user_info.uid }}"
+    - name: Set xdg_runtime_dir fact
+      set_fact:
+        xdg_runtime_dir: "/run/user/{{ nerd_user_info.uid }}"
 
     - name: Allow passwordless sudo for nerd user
       ansible.builtin.copy:
@@ -38,82 +38,69 @@
         content: "nerd ALL=(ALL) NOPASSWD:ALL\n"
         mode: '0440'
 
-    - name: Enable lingering
+    - name: Check if lingering is already enabled
+      ansible.builtin.stat:
+        path: "/var/lib/systemd/linger/nerd"
+      register: linger_file
       become: true
-      command: loginctl enable-linger nerd
 
-    - name: Start user systemd for nerd
+    - name: Enable lingering for 'nerd'
+      command: "loginctl enable-linger nerd"
       become: true
+      when: not linger_file.stat.exists
+
+    - name: Start user systemd session for nerd
       become_user: nerd
-      shell: |
-        systemd-run --user --scope echo "user systemd running"
-      args:
-        executable: /bin/bash
+      ansible.builtin.shell: |
+        export XDG_RUNTIME_DIR=/run/user/$(id -u)
+        systemd --user &
+      async: 0
+      poll: 0
+
+    - name: Create /run/user/1000 directory
+      ansible.builtin.file:
+        path: "{{ xdg_runtime_dir }}"
+        state: directory
+        owner: nerd
+        group: nerd
+        mode: '0700'
+      become: true
+
+    - name: Check if DBUS session is already in .bashrc
+      become_user: nerd
+      ansible.builtin.shell: grep -q "DBUS_SESSION_BUS_ADDRESS" ~/.bashrc
+      register: dbus_bashrc_check
+      failed_when: false
       changed_when: false
 
-#     - name: Check if lingering is already enabled
-#       ansible.builtin.stat:
-#         path: "/var/lib/systemd/linger/nerd"
-#       register: linger_file
-#       become: true
-# 
-#     - name: Enable lingering for 'nerd'
-#       command: "loginctl enable-linger nerd"
-#       become: true
-#       when: not linger_file.stat.exists
-# 
-#     - name: Start user systemd session for nerd
-#       become_user: nerd
-#       ansible.builtin.shell: |
-#         export XDG_RUNTIME_DIR=/run/user/$(id -u)
-#         systemd --user &
-#       async: 0
-#       poll: 0
-# 
-#     - name: Create /run/user/1000 directory
-#       ansible.builtin.file:
-#         path: "{{ xdg_runtime_dir }}"
-#         state: directory
-#         owner: nerd
-#         group: nerd
-#         mode: '0700'
-#       become: true
-# 
-#     - name: Check if DBUS session is already in .bashrc
-#       become_user: nerd
-#       ansible.builtin.shell: grep -q "DBUS_SESSION_BUS_ADDRESS" ~/.bashrc
-#       register: dbus_bashrc_check
-#       failed_when: false
-#       changed_when: false
-# 
-#     - name: Bootstrap dbus session and store env
-#       become_user: nerd
-#       shell: |
-#         eval $(dbus-launch --sh-syntax)
-#         echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >> ~/.bashrc
-#         echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" > ~/.dbus_env
-#       environment:
-#         XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
-#       when: dbus_bashrc_check.rc != 0
-# 
-#     - name: Update apt cache
-#       apt:
-#         update_cache: true
-#         cache_valid_time: 600
-#       when: ansible_os_family == 'Debian'
-#       become: true
-# 
-#     - name: Wait for systemd to be ready
-#       command: systemctl is-system-running
-#       register: systemctl_status
-#       until: >
-#         'running' in systemctl_status.stdout or
-#         'degraded' in systemctl_status.stdout
-#       retries: 30
-#       delay: 5
-#       when: ansible_service_mgr == 'systemd'
-#       changed_when: false
-#       failed_when: systemctl_status.rc > 1
+    - name: Bootstrap dbus session and store env
+      become_user: nerd
+      shell: |
+        eval $(dbus-launch --sh-syntax)
+        echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" >> ~/.bashrc
+        echo "export DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS}" > ~/.dbus_env
+      environment:
+        XDG_RUNTIME_DIR: "{{ xdg_runtime_dir }}"
+      when: dbus_bashrc_check.rc != 0
+
+    - name: Update apt cache
+      apt:
+        update_cache: true
+        cache_valid_time: 600
+      when: ansible_os_family == 'Debian'
+      become: true
+
+    - name: Wait for systemd to be ready
+      command: systemctl is-system-running
+      register: systemctl_status
+      until: >
+        'running' in systemctl_status.stdout or
+        'degraded' in systemctl_status.stdout
+      retries: 30
+      delay: 5
+      when: ansible_service_mgr == 'systemd'
+      changed_when: false
+      failed_when: systemctl_status.rc > 1
 
   roles:
     - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
