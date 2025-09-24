@@ -12,7 +12,7 @@ driver:
 platforms:
   - name: debian12
     image: trfore/docker-debian12-systemd
-    command: ${MOLECULE_COMMAND:-""}
+    command: /sbin/init
     tmpfs:
       - /run
       - /tmp
