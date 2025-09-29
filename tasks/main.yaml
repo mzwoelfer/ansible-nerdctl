@@ -38,6 +38,15 @@
         mode: '0644'
       become: true
 
-- name: Enable buildkit
+- name: Enable buildkit rootless
   ansible.builtin.shell: containerd-rootless-setuptool.sh install-buildkit
   become_user: "{{ nerdctl_user }}"
+  when: nerdctl_rootless
+
+- name: Enable buildkit
+  ansible.builtin.systemd_service:
+    name: buildkit
+    enabled: true
+    state: started
+  become: true
+  when: not nerdctl_rootless
