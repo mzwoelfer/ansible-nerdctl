@@ -1,0 +1,30 @@
+---
+- name: Verify Nerdctl Role
+  hosts: all
+  become: true
+  tasks:
+    - name: Verify Nerdctl is available
+      command: nerdctl version
+      register: nerdctl_version_result
+      changed_when: false
+      failed_when: nerdctl_version_result.rc != 0
+    
+    - name: Show Nerdctl version details
+      debug:
+        msg: >
+          Nerdctl version output:
+          {{ nerdctl_version_result.stdout_lines | join('\n') }}
+
+    - name: Pull the 'hello-world' image
+      command: nerdctl pull hello-world
+      register: nerdctl_pull_result
+      changed_when: true
+      failed_when: nerdctl_pull_result.rc != 0
+
+    - name: Show result of pulling the 'hello-world' image
+      debug:
+        msg: >
+          Pulling 'hello-world' completed with output:
+          {{ nerdctl_pull_result.stdout_lines | join('\n') }}
+
+  

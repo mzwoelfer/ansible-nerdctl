@@ -1,0 +1,60 @@
+- name: Install required packages
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+      become: true
+
+    - name: Install required packages
+      ansible.builtin.apt:
+        name: "{{ nerdctl_rootless_packages }}"
+        state: present
+      become: true
+
+    - name: Symlink mount.fuse3 into default Debian11 $PATH
+      file: 
+        src: /sbin/mount.fuse3
+        dest: /usr/local/bin/mount.fuse3
+        state: link
+        force: true
+      when:
+        - ansible_distribution == "Debian"
+        - ansible_distribution_major_version == "11"
+      become: true
+  when: nerdctl_rootless
+
+
+- name: Ensure iptables and ip6tables accessible in $PATH
+  become: true
+  block:
+    - name: Check if iptables and ip6tables are installed
+      ansible.builtin.stat:
+        path: "/usr/sbin/{{ item }}"
+      loop:
+        - iptables
+        - ip6tables
+      register: iptables_check
+
+    - name: Create symlink for iptables and ip6tables for path in default Debian $PATH
+      file:
+        src: "/usr/sbin/{{ item.item }}"
+        dest: "/usr/local/bin/{{ item.item }}"
+        state: link
+      loop: "{{ iptables_check.results }}"
+      when: item.stat.exists
+  when: nerdctl_rootless
+
+- name: Enable lingering for user (required for rootless mode)
+  ansible.builtin.command: "loginctl enable-linger {{ nerdctl_user }}"
+  become: true
+  changed_when: false
+  when: nerdctl_rootless
+
+- name: Enable dbus user session
+  ansible.builtin.systemd_service:
+    name: dbus
+    state: started
+    scope: user
+    enabled: true
+  become_user: "{{ nerdctl_user }}"
+  when: nerdctl_rootless

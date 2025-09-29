@@ -1,0 +1,14 @@
+_nerdctl_rootless_packages:
+  default:
+    - uidmap
+    - dbus-user-session
+  Debian-11:
+    - uidmap
+    - dbus-user-session
+    - fuse3
+
+nerdctl_rootless_packages: >-
+  {{ _nerdctl_rootless_packages[ansible_distribution ~ '-' ~ ansible_distribution_major_version]
+      | default(_nerdctl_rootless_packages[ansible_distribution]
+      | default(_nerdctl_rootless_packages['default']))
+  }}
