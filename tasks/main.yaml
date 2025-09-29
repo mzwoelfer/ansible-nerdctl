@@ -1,4 +1,4 @@
-- include_tasks: setup_system.yaml
+- include_tasks: rootless_setup_system.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
 
 - name: Rootless install
