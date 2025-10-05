@@ -17,6 +17,9 @@ jobs:
     name: Molecule (Debian12)
     runs-on: ubuntu-latest
 
+    env:
+      ANSIBLE_ROLES_PATH: ~/.ansible/roles:${{ github.workspace }}
+
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
