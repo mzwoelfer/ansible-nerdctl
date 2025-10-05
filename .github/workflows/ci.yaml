@@ -18,11 +18,13 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ANSIBLE_ROLES_PATH: ~/.ansible/roles:${{ github.workspace }}
+      ANSIBLE_ROLES_PATH: ~/.ansible/roles:${{ github.workspace }}/ansible-nerdctl
 
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
+        with:
+          path: ansible-nerdctl
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -34,14 +36,18 @@ jobs:
           pip install ansible molecule molecule-plugins[docker] docker
 
       - name: Rootful testing
-        run: molecule test -s rootful
+        run: |
+          cd ansible-nerdctl
+          molecule test -s rootful
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: "debian12"
 
       - name: Rootless testing
-        run: molecule test -s rootless
+        run: |
+          cd ansible-nerdctl
+          molecule test -s rootful
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
