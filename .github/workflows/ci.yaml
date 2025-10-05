@@ -36,18 +36,14 @@ jobs:
           pip install ansible molecule molecule-plugins[docker] docker
 
       - name: Rootful testing
-        run: |
-          cd ansible-nerdctl
-          molecule test -s rootful
+        run: molecule test -s rootful
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: "debian12"
 
       - name: Rootless testing
-        run: |
-          cd ansible-nerdctl
-          molecule test -s rootful
+        run: molecule test -s rootful
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
