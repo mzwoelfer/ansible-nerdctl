@@ -23,8 +23,6 @@ jobs:
     steps:
       - name: Checkout codebase
         uses: actions/checkout@v4
-        with:
-          path: ansible-nerdctl
 
       - name: Setup Python
         uses: actions/setup-python@v5
