@@ -37,6 +37,7 @@ jobs:
 
       - name: Rootful testing
         run: molecule test -s rootful
+        working-directory: ansible-nerdctl
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
@@ -44,6 +45,7 @@ jobs:
 
       - name: Rootless testing
         run: molecule test -s rootful
+        working-directory: ansible-nerdctl
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
