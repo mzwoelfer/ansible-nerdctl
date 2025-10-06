@@ -11,15 +11,13 @@ driver:
 
 platforms:
   - name: instance
-    image: ghcr.io/molecule-systemd/docker-systemd:debian12
+    image: "geerlingguy/docker-debian12-ansible:latest"
     command: "/sbin/init"
-    privileged: true
-    pre_build_image: true
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
-    environment:
-      container: docker
+    privileged: true
+    pre_build_image: true
 
 provisioner:
   name: ansible
