@@ -11,7 +11,7 @@ driver:
 
 platforms:
   - name: instance
-    image: "jrei/systemd-debian:12"
+    image: ghcr.io/molecule-systemd/docker-systemd:debian12
     command: "/sbin/init"
     privileged: true
     pre_build_image: true
