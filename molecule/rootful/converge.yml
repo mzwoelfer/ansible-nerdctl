@@ -78,6 +78,6 @@
       failed_when: systemctl_status.rc > 1
 
   roles:
-    - role: ansible-nerdctl
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
       vars:
         nerdctl_rootless: false
