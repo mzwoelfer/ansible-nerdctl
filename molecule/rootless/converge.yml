@@ -81,5 +81,3 @@
 
   roles:
     - role: mzwoelfer.ansible_nerdctl
-      vars:
-        nerdctl_user: "{{ nerdctl_user }}"
