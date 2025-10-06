@@ -26,6 +26,20 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: COnfigure docker for systemd
+        run: |
+          sudo mkdir -p /etc/docker
+          echo '{
+            "features": {
+              "buildkit": true
+            },
+            "exec-opts": ["native.cgroupdriver=systemd"]
+          }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl restart docker || true
+
+      - name: Install docker
+        uses: docker/setup-buildx-action@v3
+
       - name: Install Molecule + dependencies
         run: |
           pip install ansible molecule molecule-plugins[docker] docker
