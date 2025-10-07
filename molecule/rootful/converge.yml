@@ -3,6 +3,11 @@
   hosts: all
 
   pre_tasks:
+    - name: Install sudo
+      ansible.builtin.package:
+        name: sudo
+        state: present
+
     - name: Create test user '{{ nerdctl_user }}'
       ansible.builtin.user:
         name: "{{ nerdctl_user }}"
