@@ -2,6 +2,9 @@ _nerdctl_rootless_packages:
   default:
     - uidmap
     - dbus-user-session
+  Rocky-9:
+    - dbus-daemon
+    - shadow-utils
   Debian-11:
     - uidmap
     - dbus-user-session
