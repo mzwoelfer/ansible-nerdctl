@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: ansible-nerdctl
+  role_name: ansible_nerdctl
   author: mzwoelfer
   description: Installs latest (rootless) Nerdctl full (installs containerd) version on Debian from GitHub.
   license: MIT
