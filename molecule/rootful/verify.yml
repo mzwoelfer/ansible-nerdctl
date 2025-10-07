@@ -1,7 +1,6 @@
 ---
 - name: Verify Nerdctl Role
   hosts: all
-  become: true
   tasks:
     - name: Verify Nerdctl is available
       command: nerdctl version
