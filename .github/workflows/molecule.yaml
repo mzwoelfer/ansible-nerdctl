@@ -16,6 +16,11 @@ jobs:
   molecule: 
     name: Molecule (Debian12)
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - debian12
 
     steps:
       - name: Checkout codebase
@@ -49,4 +54,4 @@ jobs:
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
-          MOLECULE_DISTRO: "debian12"
+          MOLECULE_DISTRO: "{{ matrix.distro }}"
