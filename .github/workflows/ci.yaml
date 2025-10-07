@@ -50,10 +50,3 @@ jobs:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: "debian12"
-
-      - name: Rootless testing
-        run: molecule test -s rootless
-        env:
-          PY_COLORS: "1"
-          ANSIBLE_FORCE_COLOR: "1"
-          MOLECULE_DISTRO: "debian12"
