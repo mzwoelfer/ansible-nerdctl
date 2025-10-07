@@ -55,4 +55,12 @@
     remote_src: true
   when: nerdctl_needs_update
 
+- name: Extract nerdctl to /usr/local/
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ nerdctl_archive }}"
+    dest: /usr/local
+    remote_src: true
+  become: true
+  when: nerdctl_needs_update and nerdctl_rootless
+
   # TODO: tar file still on disk... remove?
