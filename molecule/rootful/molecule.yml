@@ -10,7 +10,7 @@ driver:
   name: docker
 
 platforms:
-  - name: instance
+  - name: "Rootful nerdctl ${MOLECULE_DISTRO:-debian12}"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian12}-ansible:latest"
     command: "/sbin/init"
     volumes:
