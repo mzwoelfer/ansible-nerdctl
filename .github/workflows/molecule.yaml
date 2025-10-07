@@ -23,6 +23,7 @@ jobs:
           - debian13
           - debian12
           - debian11
+          - rockylinux9
 
     steps:
       - name: Checkout codebase
