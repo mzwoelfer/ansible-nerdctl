@@ -6,7 +6,7 @@
       become: true
 
     - name: Install required packages
-      ansible.builtin.apt:
+      ansible.builtin.package:
         name: "{{ nerdctl_rootless_packages }}"
         state: present
       become: true
