@@ -14,7 +14,7 @@ defaults:
 
 jobs: 
   molecule: 
-    name: Molecule 
+    name: Rootful molecule test on 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
