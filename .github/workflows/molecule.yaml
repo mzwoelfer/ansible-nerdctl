@@ -25,6 +25,7 @@ jobs:
           - debian11
           - rockylinux9
           - rockylinux10
+          - ubuntu2204
 
     steps:
       - name: Checkout codebase
