@@ -1,36 +1,24 @@
-# Ansible Role: Install Nerdctl
+# Ansible Role: nerdctl
 
-Install the latest rootless Nerdctl full (installs containerd) version on a Debian system from GitHub.
+Installs [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible CLI for containerd.
 
-[Nerdctl](https://github.com/containerd/nerdctl): contaiNERD CTL - Docker-compatible CLI for containerd.
+## Features
 
-Tested on:
-- [X] Debian 11/12/13
+- Installs latest rootless nerdctl + containerd from GitHub releases
+- Supports Debian 11/12/13
+- Handles Debian 11 rootless quirks automatically
+- Optional version pinning
 
-Under development:
-- [ ] RHEL 8/9/10 support (Testing on Rocky Linux)
-- [ ] rootfull install
-- [ ] Own path for containerd tarball
+## Usage
 
-## Requirements
-None.
-
-## Dependencies
-None.
-
-## Role Variable
-None.
-
-## Example Playbook
-Installs latest rootless nerdctl + containerd version
-```YAML
+```yaml
 - hosts: all
   roles:
     - role: ansible-nerdctl
 ```
 
-To install a specific version:
-```YAML
+With specific version:
+```yaml
 - hosts: all
   roles:
     - role: ansible-nerdctl
@@ -38,26 +26,7 @@ To install a specific version:
         nerdctl_version: "1.7.4"
 ```
 
+## License
 
-## Testing
-1. Install requirements
-```SHELL
-sudo apt install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils virtinst
-```
-
-2. Setup python environment: 
-```SHELL
-python3 -m venv Env
-source Env/bin/activate
-
-pip install molecule 
-```
-
-3. Create molecule scenario
-```SHELL
-
-```
-
-## LICENSE
 MIT
 
