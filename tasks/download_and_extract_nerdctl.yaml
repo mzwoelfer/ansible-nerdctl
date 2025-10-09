@@ -18,13 +18,14 @@
         url: "https://github.com/containerd/nerdctl/releases/latest"
         method: HEAD
         follow_redirects: none
-      register: nerdctl_latest
+        status_code: 302
+      register: response
       changed_when: false
       when: nerdctl_version == "latest"
 
     - name: Set latest available nerdctl version
       set_fact:
-        nerdctl_latest_version: "{{ nerdctl_latest.location | regex_search('tag/v?([0-9.]+)$', '\\1')}}"
+        nerdctl_latest_version: "{{ response.location | regex_search('tag/v?([0-9.]+)$', '\\1')}}"
       when: nerdctl_version == "latest"
 
 - name: Determine if nerdctl needs update
