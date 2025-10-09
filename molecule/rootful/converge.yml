@@ -6,6 +6,7 @@
     - name: apt update (on Debian)
       ansible.builtin.apt:
         update_cache: true
+        cache_valid_time: 3600  # Only update if cache is older than 1 hour
       when: ansible_os_family == "Debian"
 
     - name: Ensure iptables is installed (different per OS)
