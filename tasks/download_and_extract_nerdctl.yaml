@@ -12,16 +12,20 @@
   when: nerdctl_installed_output.rc == 0
 
 - name: Check latest nerdctl version from github
-  ansible.builtin.uri:
-    url: "{{ nerdctl_latest_api_url }}"
-    return_content: true
-  register: nerdctl_latest
-  when: nerdctl_version == "latest"
+  block:
+    - name: Get latest nerdctl version from GitHub
+      ansible.builtin.uri:
+        url: "https://github.com/containerd/nerdctl/releases/latest"
+        method: HEAD
+        follow_redirect: none
+      register: nerdctl_latest
+      changed_when: false
+      when: nerdctl_version == "latest"
 
-- name: Set latest available nerdctl version
-  set_fact:
-    nerdctl_version: "{{ nerdctl_latest.json.tag_name | regex_replace('^v', '') }}"
-  when: nerdctl_version == "latest"
+    - name: Set latest available nerdctl version
+      set_fact:
+        nerdctl_latest_version: "{{ nerdctl_latest.location | regex_search('tag/v?([0-9.]+)$', '\\1')}}"
+      when: nerdctl_version == "latest"
 
 - name: Determine if nerdctl needs update
   set_fact:
