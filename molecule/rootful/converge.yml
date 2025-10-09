@@ -3,6 +3,22 @@
   hosts: all
 
   pre_tasks:
+    - name: Ensure iptables is installed (different per OS)
+      ansible.builtin.package:
+        name: "{{ iptables_pkg }}"
+        state: present
+      vars:
+        iptables_pkg: >-
+          {% if ansible_os_family == 'Debian' %}
+          iptables
+          {% elif ansible_os_family == 'RedHat' %}
+          iptables-nft
+          {% elif ansible_os_family == 'Suse' %}
+          iptables
+          {% else %}
+          iptables
+          {% endif %}
+
     - name: Wait for systemd to be ready
       command: systemctl is-system-running
       register: systemctl_status
