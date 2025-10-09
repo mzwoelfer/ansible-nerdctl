@@ -14,7 +14,7 @@ defaults:
 
 jobs: 
   molecule: 
-    name: Molecule 
+    name: Rootful molecule test on 
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -24,6 +24,12 @@ jobs:
           - debian12
           - debian11
           - rockylinux9
+          - rockylinux10
+          - ubuntu2204
+          - ubuntu2404
+          - fedora40
+          - fedora41
+          - fedora42
 
     steps:
       - name: Checkout codebase

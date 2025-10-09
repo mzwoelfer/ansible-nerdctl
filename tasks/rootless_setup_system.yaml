@@ -1,12 +1,7 @@
 - name: Install required packages
   block:
-    - name: Update apt cache
-      ansible.builtin.apt:
-        update_cache: true
-      become: true
-
     - name: Install required packages
-      ansible.builtin.apt:
+      ansible.builtin.package:
         name: "{{ nerdctl_rootless_packages }}"
         state: present
       become: true
