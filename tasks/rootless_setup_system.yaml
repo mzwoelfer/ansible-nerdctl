@@ -25,7 +25,7 @@
 
 
 - name: Ensure iptables and ip6tables accessible in $PATH
-  become: true
+  become: "{{ nerdctl_rootless }}"
   block:
     - name: Check if iptables and ip6tables are installed
       ansible.builtin.stat:
