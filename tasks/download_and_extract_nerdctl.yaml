@@ -17,7 +17,7 @@
       ansible.builtin.uri:
         url: "https://github.com/containerd/nerdctl/releases/latest"
         method: HEAD
-        follow_redirect: none
+        follow_redirects: none
       register: nerdctl_latest
       changed_when: false
       when: nerdctl_version == "latest"
