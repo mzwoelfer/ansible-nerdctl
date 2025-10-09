@@ -1,10 +1,5 @@
 - name: Install required packages
   block:
-    - name: apt update (on Debian)
-      ansible.builtin.apt:
-        update_cache: true
-      when: ansible_distribution == "Debian"
-
     - name: Install required packages
       ansible.builtin.package:
         name: "{{ nerdctl_rootless_packages }}"
@@ -25,7 +20,7 @@
 
 
 - name: Ensure iptables and ip6tables accessible in $PATH
-  become: true
+  become: "{{ nerdctl_rootless }}"
   block:
     - name: Check if iptables and ip6tables are installed
       ansible.builtin.stat:
@@ -42,7 +37,6 @@
         state: link
       loop: "{{ iptables_check.results }}"
       when: item.stat.exists
-  when: nerdctl_rootless
 
 - name: Enable lingering for user (required for rootless mode)
   ansible.builtin.command: "loginctl enable-linger {{ nerdctl_user }}"

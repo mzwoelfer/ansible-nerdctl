@@ -47,4 +47,5 @@
         content: "{{ nerdctl_completion.stdout }}"
         dest: /usr/share/bash-completion/completions/nerdctl
         mode: '0644'
+      become: "{{ nerdctl_rootless }}"
 
