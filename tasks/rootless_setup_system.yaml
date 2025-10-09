@@ -4,6 +4,7 @@
       ansible.builtin.apt:
         update_cache: true
       when: ansible_distribution == "Debian"
+      become: "{{ nerdctl_rootless }}"
 
     - name: Install required packages
       ansible.builtin.package:
