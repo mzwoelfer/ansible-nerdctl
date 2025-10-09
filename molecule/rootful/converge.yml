@@ -3,6 +3,11 @@
   hosts: all
 
   pre_tasks:
+    - name: apt update (on Debian)
+      ansible.builtin.apt:
+        update_cache: true
+      when: ansible_distribution == "Debian"
+
     - name: Ensure iptables is installed (different per OS)
       ansible.builtin.package:
         name: "{{ iptables_pkg }}"

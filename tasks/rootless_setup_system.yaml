@@ -6,7 +6,6 @@
       when: ansible_distribution == "Debian"
       become: "{{ nerdctl_rootless }}"
 
-
     - name: Install required packages
       ansible.builtin.package:
         name: "{{ nerdctl_rootless_packages }}"
