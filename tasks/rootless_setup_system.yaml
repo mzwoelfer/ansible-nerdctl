@@ -42,7 +42,6 @@
         state: link
       loop: "{{ iptables_check.results }}"
       when: item.stat.exists
-  when: nerdctl_rootless
 
 - name: Enable lingering for user (required for rootless mode)
   ansible.builtin.command: "loginctl enable-linger {{ nerdctl_user }}"
