@@ -25,7 +25,7 @@
 
     - name: Set latest available nerdctl version
       set_fact:
-        nerdctl_latest_version: "{{ response.location | regex_search('tag/v?([0-9.]+)$', '\\1')}}"
+        nerdctl_version: "{{ response.location | regex_search('tag/v?([0-9.]+)$', '\\1')}}"
       when: nerdctl_version == "latest"
 
 - name: Determine if nerdctl needs update
