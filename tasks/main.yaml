@@ -4,15 +4,16 @@
 - name: Rootless install
   when: nerdctl_rootless
   block:
-    - name: Install overlayfs quirks for Debian11
-      ansible.builtin.include_tasks: rootless_debian11_quirks.yaml
-
     - name: Run containerd rootless setup and buildkit as non-root user
       ansible.builtin.command: "{{ item }}"
       loop:
         - containerd-rootless-setuptool.sh install
         - containerd-rootless-setuptool.sh install-buildkit
       become_user: "{{ nerdctl_user }}"
+
+    - name: Install overlayfs quirks for Debian11
+      ansible.builtin.include_tasks: rootless_debian11_quirks.yaml
+
 
 - name: Rootful install - Enable and start required services
   when: not nerdctl_rootless
