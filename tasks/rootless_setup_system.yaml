@@ -45,12 +45,30 @@
   when: nerdctl_rootless
 
 - name: Enable dbus user session
-  ansible.builtin.systemd_service:
-    name: dbus
-    state: started
-    scope: user
-    enabled: true
-  become_user: "{{ nerdctl_user }}"
-  when: 
+  block:
+    - name: Check if user systemd is responsive
+      ansible.builtin.command: systemctl --user is-system-running
+      become_user: "{{ nerdctl_user }}"
+      register: user_systemctl
+      failed_when: false
+      changed_when: false
+
+    - name: Start dbus user service when user systemd is available
+      ansible.builtin.systemd_service:
+        name: dbus
+        state: started
+        scope: user
+        enabled: true
+      become_user: "{{ nerdctl_user }}"
+      when: user_systemctl.rc == 0
+
+    - name: Fallback: try to start a session bus for the user (best-effort)
+      ansible.builtin.shell: |
+        su - {{ nerdctl_user }} -s /bin/bash -c "dbus-run-session -- bash -lc 'sleep 0.5 & disown'"
+      args:
+        executable: /bin/bash
+      failed_when: false
+      changed_when: false
+  when:
     - nerdctl_rootless
     - ansible_service_mgr == 'systemd'

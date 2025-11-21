@@ -28,7 +28,9 @@
     - name: Create non-root test user for rootless install
       ansible.builtin.user:
         name: testuser
-        groups: sudo
+        # Do not assume distro-specific admin group exists in container images
+        # We only need an unprivileged user for rootless testing
+        # Add distro-specific groups only when necessary in future
         shell: /bin/bash
         create_home: true
 
