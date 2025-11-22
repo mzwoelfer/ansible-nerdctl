@@ -12,9 +12,9 @@ defaults:
   run:
     working-directory: .
 
-jobs: 
-  molecule: 
-    name: Rootful molecule test on 
+jobs:
+  molecule-rootful:
+    name: Rootful molecule test on
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -49,7 +49,7 @@ jobs:
             },
             "exec-opts": ["native.cgroupdriver=systemd"]
           }' | sudo tee /etc/docker/daemon.json
-          sudo systemctl restart docker || true
+          sudo systemctl.restart docker || true
 
       - name: Install docker
         uses: docker/setup-buildx-action@v3
@@ -64,6 +64,51 @@ jobs:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
           MOLECULE_DISTRO: ${{ matrix.distro }}
+
+  molecule-rootless:
+    name: Rootless molecule test on
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro:
+          - debian13
+          - debian12
+          - debian11
+          - rockylinux9
+          - rockylinux10
+          - ubuntu2204
+          - ubuntu2404
+          - fedora40
+          - fedora41
+          - fedora42
+
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: COnfigure docker for systemd
+        run: |
+          sudo mkdir -p /etc/docker
+          echo '{
+            "features": {
+              "buildkit": true
+            },
+            "exec-opts": ["native.cgroupdriver=systemd"]
+          }' | sudo tee /etc/docker/daemon.json
+          sudo systemctl.restart docker || true
+
+      - name: Install docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install Molecule + dependencies
+        run: |
+          pip install ansible molecule molecule-plugins[docker] docker
 
       - name: Rootless testing
         run: molecule test -s rootless
