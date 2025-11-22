@@ -24,3 +24,8 @@ provisioner:
   name: ansible
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+  inventory:
+    host_vars:
+      "rootful-nerdctl-${MOLECULE_DISTRO:-debian12}":
+        ansible_user: root
+
