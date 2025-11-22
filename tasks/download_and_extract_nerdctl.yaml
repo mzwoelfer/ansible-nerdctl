@@ -60,5 +60,7 @@
     dest: /usr/local
     remote_src: true
   when: nerdctl_needs_update
+  notify: Reload systemd units
+  
 
   # TODO: tar file still on disk... remove?
