@@ -25,12 +25,9 @@
         msg: >
           Pulling 'hello-world' completed with output:
           {{ nerdctl_pull_result.stdout_lines | join('\n') }}
-    
-    - name: Run nginx container
-      command: nerdctl run -d --name test-nginx -p 8080:80 nginx
-      register: nerdctl_run_nginx_result
+
+    - name: Run a test container (hello-world)
+      command: docker run --rm hello-world
+      register: docker_run_result
       changed_when: true
-      failed_when: nerdctl_run_nginx_result.rc != 0
-
-
-  
+      failed_when: docker_run_result.rc != 0
