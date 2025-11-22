@@ -27,7 +27,7 @@
           {{ nerdctl_pull_result.stdout_lines | join('\n') }}
 
     - name: Run a test container (hello-world)
-      command: docker run --rm hello-world
-      register: docker_run_result
+      command: nerdctl run --rm hello-world
+      register: nerdctl_run_result
       changed_when: true
-      failed_when: docker_run_result.rc != 0
+      failed_when: nerdctl_run_result.rc != 0
