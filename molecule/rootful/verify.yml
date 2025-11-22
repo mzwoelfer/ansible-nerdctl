@@ -31,3 +31,9 @@
       register: nerdctl_run_result
       changed_when: true
       failed_when: nerdctl_run_result.rc != 0
+
+    - name: Display test container output
+      debug:
+        msg: >
+          Running 'hello-world' container completed with output:
+          {{ nerdctl_run_result.stdout_lines | join('\n') }}
