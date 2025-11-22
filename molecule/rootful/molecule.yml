@@ -13,6 +13,7 @@ platforms:
   - name: "rootful-nerdctl-${MOLECULE_DISTRO:-debian12}"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian12}-ansible:latest"
     command: "/sbin/init"
+    user: root
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
