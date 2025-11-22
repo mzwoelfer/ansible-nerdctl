@@ -17,6 +17,7 @@
 
 - name: Rootful install - Enable and start required services
   when: not nerdctl_rootless
+  become: true
   ansible.builtin.systemd_service:
     name: "{{ item }}"
     enabled: true
@@ -37,5 +38,5 @@
         content: "{{ nerdctl_completion.stdout }}"
         dest: /usr/share/bash-completion/completions/nerdctl
         mode: '0644'
-      become: "{{ nerdctl_rootless }}"
+      become: true
 
