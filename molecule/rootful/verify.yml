@@ -26,13 +26,11 @@
           Pulling 'hello-world' completed with output:
           {{ nerdctl_pull_result.stdout_lines | join('\n') }}
     
-    # IDEALLY RUN CONTAINER.... BUT DOESNT WORK EASILY:
-    # RUNS INTO: OVERLAYFS AND SYSTEMD ISSUES...
-    # - name: Run nginx container
-    #   command: nerdctl run -d --name test-nginx -p 8080:80 nginx
-    #   register: nerdctl_run_nginx_result
-    #   changed_when: true
-    #   failed_when: nerdctl_run_nginx_result.rc != 0
+    - name: Run nginx container
+      command: nerdctl run -d --name test-nginx -p 8080:80 nginx
+      register: nerdctl_run_nginx_result
+      changed_when: true
+      failed_when: nerdctl_run_nginx_result.rc != 0
 
 
   
