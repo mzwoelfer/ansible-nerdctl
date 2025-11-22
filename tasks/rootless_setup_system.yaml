@@ -1,4 +1,5 @@
 - name: Install required packages
+  when: nerdctl_rootless
   block:
     - name: Install required packages
       ansible.builtin.package:
@@ -16,11 +17,11 @@
         - ansible_distribution == "Debian"
         - ansible_distribution_major_version == "11"
       become: true
-  when: nerdctl_rootless
 
 
 - name: Ensure iptables and ip6tables accessible in $PATH
-  become: "{{ nerdctl_rootless }}"
+  become: true
+  when: nerdctl_rootless
   block:
     - name: Check if iptables and ip6tables are installed
       ansible.builtin.stat:
@@ -37,14 +38,18 @@
         state: link
       loop: "{{ iptables_check.results }}"
       when: item.stat.exists
+    
 
 - name: Enable lingering for user (required for rootless mode)
-  ansible.builtin.command: "loginctl enable-linger {{ nerdctl_user }}"
   become: true
-  changed_when: false
   when: nerdctl_rootless
+  ansible.builtin.command: "loginctl enable-linger {{ nerdctl_user }}"
+  changed_when: false
 
 - name: Enable dbus user session
+  when:
+    - nerdctl_rootless
+    - ansible_service_mgr == 'systemd'
   block:
     - name: Check if user systemd is responsive
       ansible.builtin.command: systemctl --user is-system-running
@@ -69,6 +74,3 @@
         executable: /bin/bash
       failed_when: false
       changed_when: false
-  when:
-    - nerdctl_rootless
-    - ansible_service_mgr == 'systemd'
