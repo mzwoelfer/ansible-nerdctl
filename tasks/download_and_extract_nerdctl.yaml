@@ -56,11 +56,11 @@
 # Rootless shall use become.
 # Rootful does not need become (Issues in passwordless sudo)
 - name: Extract nerdctl to /usr/local/
+  become: true
   ansible.builtin.unarchive:
     src: "/tmp/{{ nerdctl_archive }}"
     dest: /usr/local
     remote_src: true
-  become: "{{ nerdctl_rootless }}"
   when: nerdctl_needs_update
 
   # TODO: tar file still on disk... remove?
