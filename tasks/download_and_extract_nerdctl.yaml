@@ -53,8 +53,6 @@
 
   # TODO: Add progress bar every few seconds. Shows how far the download proceeded already!
 
-# Rootless shall use become.
-# Rootful does not need become (Issues in passwordless sudo)
 - name: Extract nerdctl to /usr/local/
   become: true
   ansible.builtin.unarchive:
