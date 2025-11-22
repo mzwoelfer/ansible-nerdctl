@@ -62,7 +62,7 @@
       become_user: "{{ nerdctl_user }}"
       when: user_systemctl.rc == 0
 
-    - name: Fallback: try to start a session bus for the user (best-effort)
+    - name: Fallback try to start a session bus for the user (best-effort)
       ansible.builtin.shell: |
         su - {{ nerdctl_user }} -s /bin/bash -c "dbus-run-session -- bash -lc 'sleep 0.5 & disown'"
       args:
