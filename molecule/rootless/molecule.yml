@@ -10,10 +10,9 @@ driver:
   name: docker
 
 platforms:
-  - name: "rootful-nerdctl-${MOLECULE_DISTRO:-debian12}"
+  - name: "rootless-nerdctl-${MOLECULE_DISTRO:-debian12}"
     image: "geerlingguy/docker-${MOLECULE_DISTRO:-debian12}-ansible:latest"
     command: "/sbin/init"
-    user: root
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
@@ -24,8 +23,3 @@ provisioner:
   name: ansible
   playbooks:
     converge: ${MOLECULE_PLAYBOOK:-converge.yml}
-  inventory:
-    host_vars:
-      "rootful-nerdctl-${MOLECULE_DISTRO:-debian12}":
-        ansible_user: root
-
