@@ -4,12 +4,14 @@
 
   pre_tasks:
     - name: apt update (on Debian)
+      become: true
       ansible.builtin.apt:
         update_cache: true
-        cache_valid_time: 3600  # Only update if cache is older than 1 hour
+        cache_valid_time: 3600
       when: ansible_os_family == "Debian"
 
     - name: Ensure iptables is installed (different per OS)
+      become: true
       ansible.builtin.package:
         name: "{{ iptables_pkg }}"
         state: present
@@ -26,11 +28,9 @@
           {% endif %}
 
     - name: Create non-root test user for rootless install
+      become: true
       ansible.builtin.user:
         name: testuser
-        # Do not assume distro-specific admin group exists in container images
-        # We only need an unprivileged user for rootless testing
-        # Add distro-specific groups only when necessary in future
         shell: /bin/bash
         create_home: true
 
@@ -46,8 +46,40 @@
       changed_when: false
       failed_when: systemctl_status.rc > 1
 
-  roles:
-    - role: mzwoelfer.ansible_nerdctl
+    # ---- rootless user-session bootstrap for Docker Molecule ----
+
+    - name: Get testuser UID
+      ansible.builtin.command: "id -u testuser"
+      register: testuser_uid_cmd
+      changed_when: false
+
+    - name: Set testuser UID fact
+      ansible.builtin.set_fact:
+        testuser_uid: "{{ testuser_uid_cmd.stdout }}"
+
+    - name: Ensure /run/user/UID exists
+      become: true
+      ansible.builtin.file:
+        path: "/run/user/{{ testuser_uid }}"
+        state: directory
+        owner: testuser
+        group: testuser
+        mode: "0700"
+
+    - name: Start per-user systemd manager (user@UID.service)
+      become: true
+      ansible.builtin.systemd_service:
+        name: "user@{{ testuser_uid }}.service"
+        state: started
+
+  tasks:
+    - name: Apply nerdctl role (rootless) with user bus env
+      ansible.builtin.include_role:
+        name: mzwoelfer.ansible_nerdctl
       vars:
         nerdctl_rootless: true
         nerdctl_user: testuser
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ testuser_uid }}"
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ testuser_uid }}/bus"
+
