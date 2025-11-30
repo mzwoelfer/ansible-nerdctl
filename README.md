@@ -13,7 +13,7 @@ Installs [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"1.7.4"`) |
+| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
 | `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
 | `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
 | `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
