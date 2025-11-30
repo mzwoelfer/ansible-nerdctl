@@ -32,7 +32,7 @@ With specific version:
   roles:
     - role: ansible-nerdctl
       vars:
-        nerdctl_version: "1.7.4"
+        nerdctl_version: "2.2.0"
 ```
 
 ## License
