@@ -8,7 +8,7 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
 - Supports major Long term support distributions:
     - Debian 11/12/13
     - Ubuntu 2204/2404
-    - RHEL 9/19 (Rocky Linux for testing)
+    - RHEL 9/10 (Rocky Linux for testing)
     - Fedora 41/42/43
 - Optional version pinning
 
