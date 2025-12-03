@@ -10,7 +10,7 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
     - Ubuntu 2204/2404
     - RHEL 9/10 (Rocky Linux for testing)
     - Fedora 41/42/43
-- Optional version pinning
+- Installs latest verison by default
 
 ## 🚀 Usage
 
