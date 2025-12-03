@@ -1,22 +1,16 @@
 # Ansible Role: nerdctl
 
-Installs [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible CLI for containerd.
+Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible CLI for [containerd](https://github.com/containerd/containerd).
 
 ## ⭐ Features
 
 - Installs latest rootless nerdctl + containerd from GitHub releases
-- Supports Debian 11/12/13
-- Handles Debian 11 rootless quirks automatically
+- Supports major Long term suport distributions:
+    - Debian 11/12/13
+    - Ubuntu 2204/2404
+    - RHEL 9/19 (Rocky Linux for testing)
+    - Fedora 41/42/43
 - Optional version pinning
-
-## 🔧 Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
-| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
-| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
-| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
 
 ## 🚀 Usage
 
@@ -35,7 +29,20 @@ With specific version:
         nerdctl_version: "2.2.0"
 ```
 
+## 🔧 Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
+| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
+| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
+| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
+
+
 ## 🚦 Run tests on bare-metal VMs
+> [!CAUTION] ❓ WHY LOCAL TESTING?
+> I could not find a way to test user systemd stuff in the CI using containers. If you find a way, let me know.
+
 Runs Molecule against existing VMs. 
 Does not create or manage them.
 
