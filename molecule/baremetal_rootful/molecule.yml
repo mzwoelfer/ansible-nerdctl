@@ -1,0 +1,24 @@
+---
+role_name_check: 1
+
+dependency:
+  name: galaxy
+  options:
+    ignore-errors: true
+
+driver: 
+  name: default
+
+platforms:
+  - name: baremetal-vm-33
+
+provisioner:
+  name: ansible
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}
+  inventory:
+    links:
+      hosts: ../../inventory.yaml
+
+verifier:
+  name: ansible
