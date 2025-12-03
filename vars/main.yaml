@@ -12,7 +12,6 @@ _nerdctl_rootless_packages:
 
 nerdctl_rootless_packages: >-
   {{ _nerdctl_rootless_packages[ansible_distribution ~ '-' ~ ansible_distribution_major_version]
-      | default(_nerdctl_rootless_packages[ansible_distribution]
-      | default(_nerdctl_rootless_packages[ansible_os_family]
-      | default(_nerdctl_rootless_packages['default']))
+      | default(_nerdctl_rootless_packages[ansible_distribution])
+      | default(_nerdctl_rootless_packages[ansible_os_family])
   }}
