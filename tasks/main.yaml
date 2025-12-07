@@ -29,7 +29,7 @@
 - name: Enable bash completion
   block:
     - name: Generate nerdctl bash completion script
-      ansible.builtin.shell: nerdctl completion bash
+      ansible.builtin.shell: "{{ nerdctl_bin }} completion bash"
       register: nerdctl_completion
       changed_when: false
 

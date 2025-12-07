@@ -53,11 +53,11 @@
 
   # TODO: Add progress bar every few seconds. Shows how far the download proceeded already!
 
-- name: Extract nerdctl to /usr/local/
+- name: "Extract nerdctl to install prefix: {{ nerdctl_install_prefix }}"
   become: true
   ansible.builtin.unarchive:
     src: "/tmp/{{ nerdctl_archive }}"
-    dest: /usr/local
+    dest: "{{ nerdctl_install_prefix }}"
     remote_src: true
   when: nerdctl_needs_update
   notify: Reload systemd units
