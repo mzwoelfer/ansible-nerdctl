@@ -10,7 +10,7 @@ driver:
   name: default
 
 platforms:
-  - name: baremetal
+  - name: baremetal-vm-1
 
 provisioner:
   name: ansible
