@@ -3,10 +3,14 @@
   hosts: all
   become: true
   vars:
-    nerdctl_bin: "/usr/local/bin/nerdctl" # <-- Set in defaults/main.yaml
+    nerdctl_install_prefix : "/usr/local"
+    nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl" # <-- Set in defaults/main.yaml
     build_dir: "/tmp/molecule-nerdctl-build-{{ inventory_hostname }}"
     build_image: "molecule-test/minimal:latest"
     hello_image: "docker.io/library/hello-world:latest"
+
+  environment:
+    PATH: "{{ nerdctl_install_prefix }}/bin:{{ ansible_env.PATH | default('/usr/bin:/bin') }}"
 
   tasks:
     - name: Check nerdctl is installed
