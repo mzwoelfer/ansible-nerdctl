@@ -2,13 +2,18 @@
 - name: Verify Nerdctl Role
   hosts: all
   vars:
+    nerdctl_install_prefix : "/usr/local"
+    nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl" # <-- Set in defaults/main.yaml
     build_dir: "/tmp/molecule-nerdctl-build-{{ inventory_hostname }}"
     build_image: "molecule-test/minimal:latest"
     hello_image: "docker.io/library/hello-world:latest"
 
+  environment:
+    PATH: "{{ nerdctl_install_prefix }}/bin:{{ ansible_env.PATH | default('/usr/bin:/bin') }}"
+
   tasks:
     - name: Check nerdctl is installed
-      ansible.builtin.command: nerdctl --version
+      ansible.builtin.command: "{{ nerdctl_bin }} --version"
       register: nerdctl_version
       changed_when: false
       failed_when: nerdctl_version.rc != 0
@@ -18,13 +23,13 @@
         msg: "{{ nerdctl_version.stdout_lines | default([]) }}"
 
     - name: Pull hello-world image
-      ansible.builtin.command: "nerdctl pull {{ hello_image }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} pull {{ hello_image }}"
       register: pull_hello
       changed_when: false
       failed_when: pull_hello.rc != 0
 
     - name: Run hello-world container (captures output)
-      ansible.builtin.command: "nerdctl run --rm {{ hello_image }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ hello_image }}"
       register: hello_run
       failed_when: hello_run.rc != 0
 
@@ -54,7 +59,7 @@
         mode: '0644'
 
     - name: Build minimal image with nerdctl
-      ansible.builtin.command: "nerdctl build -t {{ build_image }} {{ build_dir }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} build -t {{ build_image }} {{ build_dir }}"
       register: build_result
       failed_when: build_result.rc != 0
 
@@ -63,7 +68,7 @@
         msg: "{{ build_result.stdout_lines | join('\\n') }}"
 
     - name: Run built minimal image and capture output
-      ansible.builtin.command: "nerdctl run --rm {{ build_image }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ build_image }}"
       register: built_run
       failed_when: built_run.rc != 0
 
@@ -75,13 +80,13 @@
         fail_msg: "Built image did not produce expected output. Output: {{ built_run.stdout | default('') }}"
 
     - name: "Cleanup: remove built image (best-effort)"
-      ansible.builtin.command: "nerdctl rmi {{ build_image }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ build_image }}"
       register: cleanup1
       ignore_errors: true
       changed_when: false
 
     - name: "Cleanup: remove hello-world image (best-effort)"
-      ansible.builtin.command: "nerdctl rmi {{ hello_image }}"
+      ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ hello_image }}"
       register: cleanup2
       ignore_errors: true
       changed_when: false
