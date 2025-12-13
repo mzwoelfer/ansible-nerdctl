@@ -15,3 +15,5 @@ nerdctl_rootless_packages: >-
       | default(_nerdctl_rootless_packages[ansible_distribution])
       | default(_nerdctl_rootless_packages[ansible_os_family])
   }}
+
+nerdctl_archive_path: ""

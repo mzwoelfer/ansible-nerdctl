@@ -8,3 +8,4 @@ nerdctl_home: "{{ ansible_env.HOME }}"
 
 nerdctl_install_prefix: "/usr/local"
 nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl"
+
