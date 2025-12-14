@@ -2,6 +2,10 @@
 - name: Converge
   hosts: all
 
+  vars:
+    nerdctl_archive: nerdctl-full-2.2.0-linux-amd64.tar.gz
+    nerdctl_archive_destination: "/tmp/{{ nerdctl_archive }}"
+
   pre_tasks:
     - name: apt update (on Debian)
       become: true
@@ -27,7 +31,15 @@
           iptables
           {% endif %}
 
+    - name: Copy nerdctl tar ball to target
+      become: true
+      ansible.builtin.copy:
+        src: "../../{{ nerdctl_archive }}"
+        dest: "{{ nerdctl_archive_destination }}"
+        mode: "0644"
+
   roles:
     - role: mzwoelfer.ansible_nerdctl
       vars:
         nerdctl_rootless: true
+        nerdctl_archive_path: "{{ nerdctl_archive_destination }}"
