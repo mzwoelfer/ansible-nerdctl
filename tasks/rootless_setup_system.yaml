@@ -60,10 +60,10 @@
 
 - name: Enable required SELinux booleans for rootless containers (Fedora/RHEL)
   become: true
-  ansible.builtin.command: "{{ item }}"
+  ansible.builtin.command: "setsebool -P {{ item }} 1"
   loop:
-    - setsebool -P container_manage_cgroup 1
-    - setsebool -P container_use_fusefs 1
+    - selinuxuser_execmod
   when:
+    - ansible_selinux.status == "enabled"
     - ansible_os_family == "RedHat"
     - nerdctl_rootless
