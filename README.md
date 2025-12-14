@@ -12,10 +12,6 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
     - Fedora 41/42/43
 - Installs latest verison by default
 
-### not Supported
-- Rocky10
-
-Rocky Linux 10 removed legacy netfilter kernel modules (e.g. `xt_comment`) required by CNI bridge networking. As a result, containers cannot start with nerdctl + containerd.
 
 ## 🚀 Usage
 
@@ -115,6 +111,15 @@ molecule reset -s baremetal_rootful
 ```
 
 This clears Molecule’s local working directory — it does not touch your VMs.
+
+## Why is Rocky10 not supported?
+Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
+Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
+Workarounds are: 
+- custom kernels or 
+- host networking
+
+so Rocky10 is intentionally unsupported.
 
 ## License
 
