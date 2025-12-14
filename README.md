@@ -1,24 +1,19 @@
 # Ansible Role: nerdctl
 
-Installs [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible CLI for containerd.
+Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible CLI for [containerd](https://github.com/containerd/containerd).
 
-## Features
+## ⭐ Features
 
 - Installs latest rootless nerdctl + containerd from GitHub releases
-- Supports Debian 11/12/13
-- Handles Debian 11 rootless quirks automatically
-- Optional version pinning
+- Supports major Long term support distributions:
+    - Debian 11/12/13
+    - Ubuntu 2204/2404
+    - RHEL 9 (Rocky Linux for testing)
+    - Fedora 41/42/43
+- Installs latest verison by default
 
-## Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"1.7.4"`) |
-| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
-| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
-| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
-
-## Usage
+## 🚀 Usage
 
 ```yaml
 - hosts: all
@@ -32,8 +27,126 @@ With specific version:
   roles:
     - role: ansible-nerdctl
       vars:
-        nerdctl_version: "1.7.4"
+        nerdctl_version: "2.2.0"
 ```
+
+## 🔧 Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
+| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
+| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
+| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
+
+
+## 🚦 Run tests on bare-metal VMs
+> [!CAUTION] 
+> WHY LOCAL TESTING?
+> I could not find a way to test user systemd stuff in the CI using containers. If you find a way, let me know.
+
+Runs Molecule against existing VMs. 
+Does not create or manage them.
+
+#### 🔧 Prerequisites
+- VMs running 
+- Reach VMs via SSH without a password
+- `molecule` + `molecule-plugins` installed (“default” driver).
+
+#### Install Molecule + plugins:
+```SHELL
+pip install molecule molecule-plugins
+```
+#### 🧩 Inventory Setup
+Copy the example inventory and fill in your VM details:
+```SHELL
+cp example.inventory.yaml inventory.yaml
+```
+
+Edit the file and add:
+- VM hostnames
+- Their IPs
+- SSH user
+- SSH private key path
+(example from the Nerdctl role:)
+```YAML
+all:
+  vars:
+    ansible_user: user
+    ansible_ssh_private_key_file: ~/.ssh/github
+  hosts:
+    baremetal-vm-1:
+      ansible_host: 192.168.22.151
+    baremetal-vm-2:
+      ansible_host: 192.168.22.152
+```
+
+Molecule scenarios link this file automatically.
+
+#### ▶️ Running the Tests
+From the project root, run your scenario:
+
+Rootful install test:
+```SHELL
+molecule test -s baremetal_rootful
+```
+
+Rootless install test:
+```SHELL
+molecule test -s baremetal_rootless
+```
+
+
+Run verification individually:
+```
+molecule verify -s baremetal_rootful
+# or:
+molecule verify -s baremetal_rootless
+```
+
+#### 🧹 Resetting a Scenario
+If molecule complains:
+```SHELL
+molecule reset -s baremetal_rootful
+```
+
+This clears Molecule’s local working directory — it does not touch your VMs.
+
+## Important Notes on supported operating systems
+### Why is Rocky10 not supported?
+Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
+Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
+Workarounds are: 
+- custom kernels or 
+- host networking
+
+so Rocky10 is intentionally unsupported.
+
+### SELinux configuration for rootless containers (Fedora/RHEL)
+
+On Fedora and RHEL systems with SELinux enabled, we enable the `selinuxuser_execmod` boolean.  
+This allows rootless container runtimes to execute modules and mount filesystems without hitting SELinux restrictions.  
+The role runs:
+
+```bash
+setsebool -P selinuxuser_execmod 1
+```
+only when nerdctl_rootless is true and SELinux is active.
+
+### AppArmor configuration for rootless containers (Ubuntu 24.04+)
+
+Apparmor may block rootlesskit on Ubuntu 24.04 and later.
+It clocks it from creating user namespaces or performing certain operations.  
+The role detects the installed `rootlesskit` binary and installs a minimal AppArmor profile to allow it to run unconfined:
+
+- Creates `/etc/apparmor.d/usr.local.bin.rootlesskit` with `flags=(unconfined)` for the detected binary path.
+- Reloads the AppArmor service to apply the profile.
+
+This ensures that rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
+
+We install it in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
+To allow it to run under AppArmor, we add a custom profile and reload AppArmor.
+
 
 ## License
 

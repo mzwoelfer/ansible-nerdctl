@@ -1,2 +1,4 @@
 Env/
 ENV/
+inventory.y*
+*.tar.gz

@@ -1,0 +1,9 @@
+all:
+  vars:
+    ansible_user: user
+    ansible_ssh_private_key_file: ~/.ssh/baremetal
+  hosts:
+    baremetal-vm-1:
+      ansible_host: 192.168.22.152
+    baremetal-vm-2:
+      ansible_host: 192.168.22.157

@@ -1,5 +1,8 @@
 - include_tasks: rootless_setup_system.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
+- include_tasks: ubuntu_rootless_security_fixes.yaml
+  when: nerdctl_rootless
+
 
 - name: Rootless install
   when: nerdctl_rootless
@@ -29,7 +32,7 @@
 - name: Enable bash completion
   block:
     - name: Generate nerdctl bash completion script
-      ansible.builtin.shell: nerdctl completion bash
+      ansible.builtin.shell: "{{ nerdctl_bin }} completion bash"
       register: nerdctl_completion
       changed_when: false
 

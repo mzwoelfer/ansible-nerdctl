@@ -5,3 +5,7 @@ nerdctl_rootless: true
 
 nerdctl_user: "{{ ansible_user_id | default(ansible_user) }}"
 nerdctl_home: "{{ ansible_env.HOME }}"
+
+nerdctl_install_prefix: "/usr/local"
+nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl"
+

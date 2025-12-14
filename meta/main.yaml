@@ -10,6 +10,17 @@ galaxy_info:
         - bullseye
         - bookworm
         - trixie
+    - name: Ubuntu
+      versions:
+        - jammy       
+        - noble      
+    - name: Rocky
+      versions:
+        - '9'
+    - name: Fedora
+      versions:
+        - '41'
+        - '42'
   galaxy_tags:
     - nerdctl
     - containerd

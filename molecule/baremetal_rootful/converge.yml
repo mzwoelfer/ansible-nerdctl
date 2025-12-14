@@ -1,0 +1,45 @@
+---
+- name: Converge
+  hosts: all
+
+  vars:
+    nerdctl_archive: nerdctl-full-2.2.0-linux-amd64.tar.gz
+    nerdctl_archive_destination: "/tmp/{{ nerdctl_archive }}"
+
+  pre_tasks:
+    - name: apt update (on Debian)
+      become: true
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600  # Only update if cache is older than 1 hour
+      when: ansible_os_family == "Debian"
+
+    - name: Ensure iptables is installed (different per OS)
+      become: true
+      ansible.builtin.package:
+        name: "{{ iptables_pkg }}"
+        state: present
+      vars:
+        iptables_pkg: >-
+          {% if ansible_os_family == 'Debian' %}
+          iptables
+          {% elif ansible_os_family == 'RedHat' %}
+          iptables-nft
+          {% elif ansible_os_family == 'Suse' %}
+          iptables
+          {% else %}
+          iptables
+          {% endif %}
+
+    - name: Copy nerdctl tar ball to target
+      become: true
+      ansible.builtin.copy:
+        src: "../../{{ nerdctl_archive }}"
+        dest: "{{ nerdctl_archive_destination }}"
+        mode: "0644"
+
+  roles:
+    - role: mzwoelfer.ansible_nerdctl
+      vars:
+        nerdctl_rootless: false
+        nerdctl_archive_path: "{{ nerdctl_archive_destination }}"
