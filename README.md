@@ -8,9 +8,14 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
 - Supports major Long term support distributions:
     - Debian 11/12/13
     - Ubuntu 2204/2404
-    - RHEL 9/10 (Rocky Linux for testing)
+    - RHEL 9 (Rocky Linux for testing)
     - Fedora 41/42/43
 - Installs latest verison by default
+
+### not Supported
+- Rocky10
+
+Rocky Linux 10 removed legacy netfilter kernel modules (e.g. `xt_comment`) required by CNI bridge networking. As a result, containers cannot start with nerdctl + containerd.
 
 ## 🚀 Usage
 
