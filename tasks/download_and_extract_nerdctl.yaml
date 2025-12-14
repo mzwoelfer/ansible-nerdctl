@@ -6,12 +6,33 @@
   changed_when: false
   become_user: "{{ nerdctl_user }}"
 
-- name: Check provided nerdctl archive (if any)
-  ansible.builtin.stat:
-    path: "{{ nerdctl_archive_path }}"
-  register: nerdctl_archive_stat
+# ==========================================================I==
+# OFFLINE MODE: user provided archive path
+# ============================================================
+- name: Use provided nerdctl archive
   when: nerdctl_archive_path | length > 0
+  block:
+    - name: Check provided nerdctl archive exists
+      ansible.builtin.stat:
+        path: "{{ nerdctl_archive_path }}"
+      register: nerdctl_archive_stat
 
+    - name: Fail if provided nerdctl archive does not exist
+      ansible.builtin.fail:
+        msg: "Provided nerdctl_archive_path does not exist: {{ nerdctl_archive_path }}"
+      when: not nerdctl_archive_stat.stat.exists
+
+    - name: Set effective nerdctl archive path (offline)
+      set_fact:
+        nerdctl_effective_archive_path: "{{ nerdctl_archive_path }}"
+
+    - name: Force install when using local archive
+      set_fact:
+        nerdctl_needs_update: true
+
+# ============================================================
+# ONLINE MODE: GitHub download
+# ============================================================
 - name: Online (GitHub download) install
   when: nerdctl_archive_path | length == 0
   block:
@@ -53,25 +74,27 @@
 
   - name: Set archive path for extraction
     set_fact:
-      nerdctl_archive_path: "/tmp/{{ nerdctl_archive }}"
+      nerdctl_effective_archive_path: "/tmp/{{ nerdctl_archive }}"
     when: nerdctl_needs_update
 
   - name: Download nerdctl if not already installed
     ansible.builtin.get_url:
       url: "{{ nerdctl_download_url }}"
-      dest: "{{ nerdctl_archive_path }}"
+      dest: "{{ nerdctl_effective_archive_path }}"
       mode: 0755
       owner: "{{ nerdctl_user }}"
     become_user: "{{ nerdctl_user }}"
     when: nerdctl_needs_update
 
+# ============================================================
+# EXTRACTION 
+# ============================================================
 - name: "Extract nerdctl to install prefix: {{ nerdctl_install_prefix }}"
   become: true
   ansible.builtin.unarchive:
-    src: "{{ nerdctl_archive_path }}"
+    src: "{{ nerdctl_effective_archive_path }}"
     dest: "{{ nerdctl_install_prefix }}"
     remote_src: true
   when: nerdctl_needs_update
   notify: Reload systemd units
 
-  # TODO: tar file still on disk... remove?
