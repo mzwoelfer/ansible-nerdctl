@@ -57,3 +57,13 @@
   when: 
     - nerdctl_rootless
     - ansible_service_mgr == 'systemd'
+
+- name: Enable required SELinux booleans for rootless containers (Fedora/RHEL)
+  become: true
+  ansible.builtin.command: "{{ item }}"
+  loop:
+    - setsebool -P container_manage_cgroup 1
+    - setsebool -P container_use_fusefs 1
+  when:
+    - ansible_os_family == "RedHat"
+    - nerdctl_rootless
