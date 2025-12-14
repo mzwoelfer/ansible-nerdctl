@@ -1,0 +1,31 @@
+- name: Detect rootlesskit path
+  ansible.builtin.command: command -v rootlesskit
+  register: rootlesskit_path
+  changed_when: false
+
+- name: Allow rootlesskit in AppArmor (Ubuntu 24.04+)
+  become: true
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version is version('24.04', '>=')
+    - rootlesskit_path.stdout.startswith('/usr/local/bin')
+  block:
+
+    - name: Install AppArmor profile for rootlesskit
+      ansible.builtin.copy:
+        dest: /etc/apparmor.d/usr.local.bin.rootlesskit
+        mode: '0644'
+        content: |
+          abi <abi/4.0>,
+          include <tunables/global>
+
+          {{ rootlesskit_path.stdout }} flags=(unconfined) {
+            userns,
+            include if exists <local/usr.local.bin.rootlesskit>
+          }
+
+    - name: Reload AppArmor
+      ansible.builtin.service:
+        name: apparmor
+        state: restarted
+
