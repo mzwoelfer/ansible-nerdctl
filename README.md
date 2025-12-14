@@ -112,7 +112,8 @@ molecule reset -s baremetal_rootful
 
 This clears Molecule’s local working directory — it does not touch your VMs.
 
-## Why is Rocky10 not supported?
+## Important Notes on supported operating systems
+### Why is Rocky10 not supported?
 Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
 Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
 Workarounds are: 
@@ -120,6 +121,32 @@ Workarounds are:
 - host networking
 
 so Rocky10 is intentionally unsupported.
+
+### SELinux configuration for rootless containers (Fedora/RHEL)
+
+On Fedora and RHEL systems with SELinux enabled, we enable the `selinuxuser_execmod` boolean.  
+This allows rootless container runtimes to execute modules and mount filesystems without hitting SELinux restrictions.  
+The role runs:
+
+```bash
+setsebool -P selinuxuser_execmod 1
+```
+only when nerdctl_rootless is true and SELinux is active.
+
+### AppArmor configuration for rootless containers (Ubuntu 24.04+)
+
+Apparmor may block rootlesskit on Ubuntu 24.04 and later.
+It clocks it from creating user namespaces or performing certain operations.  
+The role detects the installed `rootlesskit` binary and installs a minimal AppArmor profile to allow it to run unconfined:
+
+- Creates `/etc/apparmor.d/usr.local.bin.rootlesskit` with `flags=(unconfined)` for the detected binary path.
+- Reloads the AppArmor service to apply the profile.
+
+This ensures that rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
+
+We install it in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
+To allow it to run under AppArmor, we add a custom profile and reload AppArmor.
+
 
 ## License
 
