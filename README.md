@@ -12,7 +12,6 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
     - Fedora 41/42/43
 - Installs latest verison by default
 
-
 ## 🚀 Usage
 
 ```yaml
@@ -68,7 +67,6 @@ Edit the file and add:
 - Their IPs
 - SSH user
 - SSH private key path
-(example from the Nerdctl role:)
 ```YAML
 all:
   vars:
@@ -121,31 +119,30 @@ Workarounds are:
 - host networking
 
 so Rocky10 is intentionally unsupported.
+OUt of scope for this Ansible role.
 
 ### SELinux configuration for rootless containers (Fedora/RHEL)
 
-On Fedora and RHEL systems with SELinux enabled, we enable the `selinuxuser_execmod` boolean.  
+On SELinux systems we enable the `selinuxuser_execmod` boolean on Fedora and RHEL systems. 
 This allows rootless container runtimes to execute modules and mount filesystems without hitting SELinux restrictions.  
 The role runs:
 
 ```bash
 setsebool -P selinuxuser_execmod 1
 ```
-only when nerdctl_rootless is true and SELinux is active.
+only when `nerdctl_rootless` is true and SELinux is active.
 
 ### AppArmor configuration for rootless containers (Ubuntu 24.04+)
 
-Apparmor may block rootlesskit on Ubuntu 24.04 and later.
-It clocks it from creating user namespaces or performing certain operations.  
+Apparmor blocks `rootlesskit` on Ubuntu 24.04 and later.
+Because we install `rootlesskit` in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
+AppArmor blocks rootlesskit from creating user namespaces or performing certain operations.
 The role detects the installed `rootlesskit` binary and installs a minimal AppArmor profile to allow it to run unconfined:
 
 - Creates `/etc/apparmor.d/usr.local.bin.rootlesskit` with `flags=(unconfined)` for the detected binary path.
 - Reloads the AppArmor service to apply the profile.
 
-This ensures that rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
-
-We install it in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
-To allow it to run under AppArmor, we add a custom profile and reload AppArmor.
+This ensures rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
 
 
 ## License
