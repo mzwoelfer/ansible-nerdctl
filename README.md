@@ -116,7 +116,7 @@ molecule reset -s baremetal_rootful
 This clears Molecule’s local working directory — it does not touch your VMs.
 
 ## ❗Important Notes on supported operating systems
-### Why is Rocky10 not supported?
+### ❓ Why is Rocky10 not supported?
 Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
 Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
 Workarounds are: 
@@ -126,7 +126,7 @@ Workarounds are:
 so Rocky10 is intentionally unsupported.
 OUt of scope for this Ansible role.
 
-### Why is Fedora not supported?
+### ❓ Why is Fedora not supported?
 ##### Fedora41 - python3-libdnf5 issues
 Fedora41 nears it's end of life.
 Rootless networking with containerd/BuildKit requires Python bindings for DNF5 (python3-libdnf5). 
@@ -142,7 +142,7 @@ This breaks rootless networking and BuildKit’s default CNI setup.
 Fixing it requires kernel tweaks or preloading modules, which is outside the scope of automated testing.
 So I skip supporting rootless scenarios on Fedora42.
 
-### SELinux configuration for rootless containers (Fedora/RHEL)
+### 🔐 SELinux configuration for rootless containers (Fedora/RHEL)
 
 On SELinux systems we enable the `selinuxuser_execmod` boolean on Fedora and RHEL systems. 
 This allows rootless container runtimes to execute modules and mount filesystems without hitting SELinux restrictions.  
@@ -153,7 +153,7 @@ setsebool -P selinuxuser_execmod 1
 ```
 only when `nerdctl_rootless` is true and SELinux is active.
 
-### AppArmor configuration for rootless containers (Ubuntu 24.04+)
+### 🛡️ AppArmor configuration for rootless containers (Ubuntu 24.04+)
 
 AppArmor blocks `rootlesskit` from creating user namespaces on Ubuntu 24.04 and later.
 Because we install `rootlesskit` in `/usr/local/bin` and not in a package-managed system path like `/usr/bin`. 
@@ -167,7 +167,7 @@ The role detects the installed `rootlesskit` binary and installs a minimal AppAr
 - [Nerdctl GitHub Repository](https://github.com/containerd/nerdctl)
 - [Common steps for rootless containers](https://rootlesscontaine.rs/getting-jstarted/common/)
 
-## License
+## 📜 License
 
 MIT
 
