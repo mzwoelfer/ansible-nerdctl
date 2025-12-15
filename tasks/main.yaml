@@ -12,6 +12,7 @@
         - containerd-rootless-setuptool.sh install
         - containerd-rootless-setuptool.sh install-buildkit
       become_user: "{{ nerdctl_user }}"
+      changed_when: false
 
     - name: Install overlayfs quirks for Debian11
       ansible.builtin.include_tasks: rootless_debian11_quirks.yaml
