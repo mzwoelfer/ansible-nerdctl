@@ -45,7 +45,7 @@ With specific version:
 
 ### 📦 Install prefix recommendation by distribution
 
-The role follows the [Filesystem Hierarchy Standard]()(FHS). Therefore installing not package managed software into `/usr/local` by default. 
+By default the role installs non package managed software in `/usr/local`. Therefore following the recommendation in footnote 28 by the [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s09.html)(FHS).
 
 However, behavior differs by distribution:
 
@@ -146,6 +146,7 @@ This clears Molecule’s local working directory — it does not touch your VMs.
 ## 📚 Sources
 - [Nerdctl GitHub Repository](https://github.com/containerd/nerdctl)
 - [Common steps for rootless containers](https://rootlesscontaine.rs/getting-jstarted/common/)
+- [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
 
 ## 📜 License
 
