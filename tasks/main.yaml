@@ -1,3 +1,4 @@
+---
 - include_tasks: rootless_setup_system.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
 - include_tasks: ubuntu_rootless_security_fixes.yaml

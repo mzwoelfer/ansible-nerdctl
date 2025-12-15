@@ -1,3 +1,4 @@
+---
 - name: Detect rootlesskit path
   ansible.builtin.shell: command -v rootlesskit
   register: rootlesskit_path
