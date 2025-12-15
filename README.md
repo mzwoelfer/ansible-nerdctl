@@ -38,6 +38,17 @@ With specific version:
 | `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
 | `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
 
+| Variable                    | Default                                          | Description                                                                       |
+| --------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
+| `nerdctl_version`           | `"latest"`                                       | Nerdctl version to install (e.g. `"2.2.0"`.           |
+| `nerdctl_rootless`          | `true`                                           | Install nerdctl + containerd in rootless mode (recommended).                      |
+| `nerdctl_user`              | `{{ ansible_user_id \| default(ansible_user) }}` | User that owns the rootless installation and user systemd units.                  |
+| `nerdctl_home`              | `{{ ansible_env.HOME }}`                         | Home directory of `nerdctl_user`.                                                 |
+| `nerdctl_install_prefix`    | `/usr/local`                                     | Location where nerdctl, containerd, rootlesskit, etc. will be installed                    |
+| `nerdctl_bin`               | `{{ nerdctl_install_prefix }}/bin/nerdctl`       | Full path to the nerdctl binary.                                                  |
+| `nerdctl_archive_path`      | `""`                                             | OPTIONAL: local path on the server to a pre-downloaded nerdctl archive (skips GitHub download).  |
+| `nerdctl_rootless_packages` | distro-specific                                  | OS-specific packages required for rootless containers (uidmap, dbus, fuse, etc.). |
+
 
 ## 🚦 Run tests on bare-metal VMs
 > [!CAUTION] 
