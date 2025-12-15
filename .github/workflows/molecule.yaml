@@ -80,7 +80,7 @@ jobs:
           pip install ansible molecule molecule-plugins[docker] docker
 
       - name: Rootful testing
-        run: molecule test -s rootful
+        run: molecule test -s ci_root
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
