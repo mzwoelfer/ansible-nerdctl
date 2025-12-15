@@ -4,12 +4,12 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
 
 ## ⭐ Features
 
-- Installs latest rootless nerdctl + containerd from GitHub releases
+- Installs rootless nerdctl + containerd from GitHub releases
+- Installs latest verison by default
 - Supports major Long term support distributions:
     - Debian 11/12/13
     - Ubuntu 2204/2404
     - RHEL 9 (Rocky Linux for testing)
-- Installs latest verison by default
 - Can use pre downloaded tar.gz nerdctl-archive
 - Requires Internet Access to download nerdctl and install packages
 
@@ -31,13 +31,6 @@ With specific version:
 ```
 
 ## 🔧 Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
-| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
-| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
-| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
 
 | Variable                    | Default                                          | Description                                                                       |
 | --------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
@@ -162,15 +155,13 @@ only when `nerdctl_rootless` is true and SELinux is active.
 
 ### AppArmor configuration for rootless containers (Ubuntu 24.04+)
 
-Apparmor blocks `rootlesskit` on Ubuntu 24.04 and later.
-Because we install `rootlesskit` in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
-AppArmor blocks rootlesskit from creating user namespaces or performing certain operations.
+AppArmor blocks `rootlesskit` from creating user namespaces on Ubuntu 24.04 and later.
+Because we install `rootlesskit` in `/usr/local/bin` and not in a package-managed system path like `/usr/bin`. 
 The role detects the installed `rootlesskit` binary and installs a minimal AppArmor profile to allow it to run unconfined:
 
 - Creates `/etc/apparmor.d/usr.local.bin.rootlesskit` with `flags=(unconfined)` for the detected binary path.
 - Reloads the AppArmor service to apply the profile.
 
-This ensures rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
 
 ## 📚 Sources
 - [Nerdctl GitHub Repository](https://github.com/containerd/nerdctl)
