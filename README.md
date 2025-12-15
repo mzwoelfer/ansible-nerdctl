@@ -10,6 +10,7 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
     - Ubuntu 2204/2404
     - RHEL 9 (Rocky Linux for testing)
 - Installs latest verison by default
+- Can use pre downloaded tar.gz nerdctl-archive
 - Requires Internet Access to download nerdctl and install packages
 
 ## 🚀 Usage
