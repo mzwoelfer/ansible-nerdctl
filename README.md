@@ -11,6 +11,7 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
     - RHEL 9 (Rocky Linux for testing)
     - Fedora 41/42/43
 - Installs latest verison by default
+- Requires Internet Access to download nerdctl and install packages
 
 ## 🚀 Usage
 
