@@ -7,13 +7,6 @@
     nerdctl_archive_destination: "/tmp/{{ nerdctl_archive }}"
 
   pre_tasks:
-    - name: Use platform-python on Fedora 41+
-      set_fact:
-        ansible_python_interpreter: /usr/libexec/platform-python
-      when:
-        - ansible_distribution == "Fedora"
-        - ansible_distribution_major_version | int >= 41
-
     - name: apt update (on Debian)
       become: true
       ansible.builtin.apt:
