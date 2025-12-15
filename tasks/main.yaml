@@ -1,8 +1,8 @@
+---
 - include_tasks: rootless_setup_system.yaml
 - include_tasks: download_and_extract_nerdctl.yaml
 - include_tasks: ubuntu_rootless_security_fixes.yaml
   when: nerdctl_rootless
-
 
 - name: Rootless install
   when: nerdctl_rootless
@@ -13,6 +13,7 @@
         - containerd-rootless-setuptool.sh install
         - containerd-rootless-setuptool.sh install-buildkit
       become_user: "{{ nerdctl_user }}"
+      changed_when: false
 
     - name: Install overlayfs quirks for Debian11
       ansible.builtin.include_tasks: rootless_debian11_quirks.yaml

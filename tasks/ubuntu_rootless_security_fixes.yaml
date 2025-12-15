@@ -1,3 +1,4 @@
+---
 - name: Detect rootlesskit path
   ansible.builtin.shell: command -v rootlesskit
   register: rootlesskit_path
@@ -25,7 +26,8 @@
           }
 
     - name: Reload AppArmor
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: apparmor
         state: restarted
+      changed_when: false
 

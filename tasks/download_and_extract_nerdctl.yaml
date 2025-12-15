@@ -1,3 +1,4 @@
+---
 # Don't fail or chagne when nerdctl version throws an error
 - name: Check if nerdctl is already installed
   ansible.builtin.command: nerdctl --version
@@ -36,27 +37,27 @@
 - name: Online (GitHub download) install
   when: nerdctl_archive_path | length == 0
   block:
-  - name: Extract installed version
-    set_fact: 
-      nerdctl_installed_version: "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
-    when: nerdctl_installed_output.rc == 0
+    - name: Extract installed version
+      set_fact: 
+        nerdctl_installed_version: "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
+      when: nerdctl_installed_output.rc == 0
 
-  - name: Check latest nerdctl version from github
-    block:
-      - name: Get latest nerdctl version from GitHub
-        ansible.builtin.uri:
-          url: "https://github.com/containerd/nerdctl/releases/latest"
-          method: HEAD
-          follow_redirects: none
-          status_code: 302
-        register: response
-        changed_when: false
-        when: nerdctl_version == "latest"
+    - name: Check latest nerdctl version from github
+      block:
+        - name: Get latest nerdctl version from GitHub
+          ansible.builtin.uri:
+            url: "https://github.com/containerd/nerdctl/releases/latest"
+            method: HEAD
+            follow_redirects: none
+            status_code: 302
+          register: response
+          changed_when: false
+          when: nerdctl_version == "latest"
 
-      - name: Set latest available nerdctl version
-        set_fact:
-          nerdctl_version: "{{ (response.location | regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}"
-        when: nerdctl_version == "latest"
+        - name: Set latest available nerdctl version
+          set_fact:
+            nerdctl_version: "{{ (response.location | regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}"
+          when: nerdctl_version == "latest"
 
   - name: Determine if nerdctl needs update
     set_fact:

@@ -4,14 +4,14 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
 
 ## ⭐ Features
 
-- Installs latest rootless nerdctl + containerd from GitHub releases
+- Installs rootless nerdctl + containerd from GitHub releases
+- Installs latest verison by default
 - Supports major Long term support distributions:
     - Debian 11/12/13
     - Ubuntu 2204/2404
     - RHEL 9 (Rocky Linux for testing)
-    - Fedora 41/42/43
-- Installs latest verison by default
-
+- Can use pre downloaded tar.gz nerdctl-archive
+- Requires Internet Access to download nerdctl and install packages
 
 ## 🚀 Usage
 
@@ -32,13 +32,45 @@ With specific version:
 
 ## 🔧 Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `nerdctl_version` | `"latest"` | Version of nerdctl to install (e.g., `"2.2.0"`) |
-| `nerdctl_rootless` | `true` | Install in rootless mode (recommended) |
-| `nerdctl_user` | `{{ ansible_user_id }}` | User to install nerdctl for |
-| `nerdctl_home` | `{{ ansible_env.HOME }}` | Home directory for the user |
+| Variable                    | Default                                          | Description                                                                       |
+| --------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------- |
+| `nerdctl_version`           | `"latest"`                                       | Nerdctl version to install (e.g. `"2.2.0"`.           |
+| `nerdctl_rootless`          | `true`                                           | Install nerdctl + containerd in rootless mode (recommended).                      |
+| `nerdctl_user`              | `{{ ansible_user_id \| default(ansible_user) }}` | User that owns the rootless installation and user systemd units.                  |
+| `nerdctl_home`              | `{{ ansible_env.HOME }}`                         | Home directory of `nerdctl_user`.                                                 |
+| `nerdctl_install_prefix`    | `/usr/local`                                     | Location where nerdctl, containerd, rootlesskit, etc. will be installed. ⚠️ On RHEL/Rocky/Alma, `/usr/local/bin` is NOT in sudo’s PATH by default. Use full paths or adjust `secure_path`.                    |
+| `nerdctl_bin`               | `{{ nerdctl_install_prefix }}/bin/nerdctl`       | Full path to the nerdctl binary.                                                  |
+| `nerdctl_archive_path`      | `""`                                             | OPTIONAL: local path on the server to a pre-downloaded nerdctl archive (skips GitHub download).  |
+| `nerdctl_rootless_packages` | distro-specific                                  | OS-specific packages required for rootless containers (uidmap, dbus, fuse, etc.). |
 
+### 📦 Install prefix recommendation by distribution
+
+By default the role installs non package managed software in `/usr/local`. Therefore following the recommendation in footnote 28 by the [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/ch04s09.html)(FHS).
+
+However, behavior differs by distribution:
+
+- **Debian / Ubuntu**
+  - `/usr/local/bin` is in the default user and `sudo` $PATH
+  - `sudo nerdctl` works out of the box
+
+- **RHEL / Rocky / Alma**
+  - `/usr/local/bin` is **not** in sudo’s `secure_path`
+  - `sudo nerdctl` will fail unless you:
+    - use the full path (`/usr/local/bin/nerdctl`), or
+    - adjust `secure_path`, or
+    - install into `/usr/bin`
+
+If you want `sudo nerdctl` to work without $PATH changes on RHEL-based systems:
+1. Use the full path:
+```BASH
+sudo /usr/local/bin/nerdctl ps
+```
+2. Extend the sudo $PATH:
+```BASH
+sudo visudo
+# extend:
+Defaults secure_path="/usr/local/bin:"
+```
 
 ## 🚦 Run tests on bare-metal VMs
 > [!CAUTION] 
@@ -68,7 +100,6 @@ Edit the file and add:
 - Their IPs
 - SSH user
 - SSH private key path
-(example from the Nerdctl role:)
 ```YAML
 all:
   vars:
@@ -112,43 +143,12 @@ molecule reset -s baremetal_rootful
 
 This clears Molecule’s local working directory — it does not touch your VMs.
 
-## Important Notes on supported operating systems
-### Why is Rocky10 not supported?
-Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
-Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
-Workarounds are: 
-- custom kernels or 
-- host networking
+## 📚 Sources
+- [Nerdctl GitHub Repository](https://github.com/containerd/nerdctl)
+- [Common steps for rootless containers](https://rootlesscontaine.rs/getting-jstarted/common/)
+- [Filesystem Hierarchy Standard](https://refspecs.linuxfoundation.org/FHS_3.0/fhs/index.html)
 
-so Rocky10 is intentionally unsupported.
-
-### SELinux configuration for rootless containers (Fedora/RHEL)
-
-On Fedora and RHEL systems with SELinux enabled, we enable the `selinuxuser_execmod` boolean.  
-This allows rootless container runtimes to execute modules and mount filesystems without hitting SELinux restrictions.  
-The role runs:
-
-```bash
-setsebool -P selinuxuser_execmod 1
-```
-only when nerdctl_rootless is true and SELinux is active.
-
-### AppArmor configuration for rootless containers (Ubuntu 24.04+)
-
-Apparmor may block rootlesskit on Ubuntu 24.04 and later.
-It clocks it from creating user namespaces or performing certain operations.  
-The role detects the installed `rootlesskit` binary and installs a minimal AppArmor profile to allow it to run unconfined:
-
-- Creates `/etc/apparmor.d/usr.local.bin.rootlesskit` with `flags=(unconfined)` for the detected binary path.
-- Reloads the AppArmor service to apply the profile.
-
-This ensures that rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
-
-We install it in `/usr/local/bin`, not a package-managed system path like `/usr/bin`. 
-To allow it to run under AppArmor, we add a custom profile and reload AppArmor.
-
-
-## License
+## 📜 License
 
 MIT
 
