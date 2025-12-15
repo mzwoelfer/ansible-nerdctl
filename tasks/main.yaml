@@ -18,7 +18,6 @@
     - name: Install overlayfs quirks for Debian11
       ansible.builtin.include_tasks: rootless_debian11_quirks.yaml
 
-
 - name: Rootful install - Enable and start required services
   when: not nerdctl_rootless
   become: true
@@ -41,6 +40,5 @@
       ansible.builtin.copy:
         content: "{{ nerdctl_completion.stdout }}"
         dest: /usr/share/bash-completion/completions/nerdctl
-        mode: '0644'
+        mode: "0644"
       become: true
-

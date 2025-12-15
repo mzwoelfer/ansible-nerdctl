@@ -20,7 +20,9 @@
 
     - name: Fail if provided nerdctl archive does not exist
       ansible.builtin.fail:
-        msg: "Provided nerdctl_archive_path does not exist: {{ nerdctl_archive_path }}"
+        msg: >-
+          "Provided nerdctl_archive_path does not exist:
+          {{ nerdctl_archive_path }}"
       when: not nerdctl_archive_stat.stat.exists
 
     - name: Set effective nerdctl archive path (offline)
@@ -38,8 +40,9 @@
   when: nerdctl_archive_path | length == 0
   block:
     - name: Extract installed version
-      set_fact: 
-        nerdctl_installed_version: "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
+      set_fact:
+        nerdctl_installed_version: >-
+          "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
       when: nerdctl_installed_output.rc == 0
 
     - name: Check latest nerdctl version from github
@@ -56,39 +59,45 @@
 
         - name: Set latest available nerdctl version
           set_fact:
-            nerdctl_version: "{{ (response.location | regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}"
+            nerdctl_version: >-
+              "{{ (response.location |
+              regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}"
           when: nerdctl_version == "latest"
 
-  - name: Determine if nerdctl needs update
-    set_fact:
-      nerdctl_needs_update: "{{ nerdctl_installed_version is not defined or nerdctl_installed_version != nerdctl_version }}"
+    - name: Determine if nerdctl needs update
+      set_fact:
+        nerdctl_needs_update: >-
+          "{{ nerdctl_installed_version is not defined
+          or nerdctl_installed_version != nerdctl_version }}"
 
-  - name: Set archive URLs
-    set_fact: 
-      nerdctl_archive: "nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
-    when: nerdctl_needs_update
+    - name: Set archive URLs
+      set_fact:
+        nerdctl_archive: "nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
+      when: nerdctl_needs_update
 
-  - name: Set nerdctl download URL
-    set_fact:
-      nerdctl_download_url: "https://github.com/containerd/nerdctl/releases/download/v{{ nerdctl_version }}/{{ nerdctl_archive }}"
-    when: nerdctl_needs_update
+    - name: Set nerdctl download URL
+      set_fact:
+        nerdctl_download_url: >-
+          "https://github.com/containerd/nerdctl/releases/download/
+          v{{ nerdctl_version }}/{{ nerdctl_archive }}"
+      when: nerdctl_needs_update
 
-  - name: Set archive path for extraction
-    set_fact:
-      nerdctl_effective_archive_path: "/tmp/{{ nerdctl_archive }}"
-    when: nerdctl_needs_update
+    - name: Set archive path for extraction
+      set_fact:
+        nerdctl_effective_archive_path: "/tmp/{{ nerdctl_archive }}"
+      when: nerdctl_needs_update
 
-  - name: Download nerdctl if not already installed
-    ansible.builtin.get_url:
-      url: "{{ nerdctl_download_url }}"
-      dest: "{{ nerdctl_effective_archive_path }}"
-      mode: 0755
-      owner: "{{ nerdctl_user }}"
-    become_user: "{{ nerdctl_user }}"
-    when: nerdctl_needs_update
+    - name: Download nerdctl if not already installed
+      ansible.builtin.get_url:
+        url: "{{ nerdctl_download_url }}"
+        dest: "{{ nerdctl_effective_archive_path }}"
+        mode: 0755
+        owner: "{{ nerdctl_user }}"
+      become_user: "{{ nerdctl_user }}"
+      when: nerdctl_needs_update
 
 # ============================================================
-# EXTRACTION 
+# EXTRACTION
 # ============================================================
 - name: "Extract nerdctl to install prefix: {{ nerdctl_install_prefix }}"
   become: true
@@ -98,4 +107,3 @@
     remote_src: true
   when: nerdctl_needs_update
   notify: Reload systemd units
-

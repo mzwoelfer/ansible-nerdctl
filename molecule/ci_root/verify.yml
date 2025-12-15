@@ -7,7 +7,7 @@
       register: nerdctl_version_result
       changed_when: false
       failed_when: nerdctl_version_result.rc != 0
-    
+
     - name: Show Nerdctl version details
       debug:
         msg: >

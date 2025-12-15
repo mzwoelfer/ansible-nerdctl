@@ -3,20 +3,21 @@
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
     - nerdctl_rootless
-  block: 
+  block:
     - name: Install fuse-overlayfs for Debian11 as non-root user
       ansible.builtin.command:
         cmd: containerd-rootless-setuptool.sh install-fuse-overlayfs
       become_user: "{{ nerdctl_user }}"
 
-    - name: Ensure cgroup controllers are delegated for user services (Debian 11)
+    - name: >-
+        Ensure cgroup controllers are delegated for user services (Debian 11)
       become: true
       block:
         - name: Create systemd override directory for user@.service
           file:
             path: /etc/systemd/system/user@.service.d
             state: directory
-            mode: '0755'
+            mode: "0755"
 
         - name: Create delegate.conf to enable cpu, cpuset, io delegation
           copy:
@@ -24,7 +25,7 @@
             content: |
               [Service]
               Delegate=cpu cpuset io memory pids
-            mode: '0644'
+            mode: "0644"
 
         - name: Reload systemd daemon to apply new cgroup delegation
           ansible.builtin.systemd_service:
@@ -50,7 +51,7 @@
                   type = "snapshot"
                   address = "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
             marker: "### BEGIN FUSE OVERLAYFS ###"
-            create: yes
+            create: true
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
             mode: 0644
@@ -62,3 +63,4 @@
             line: 'export CONTAINERD_SNAPSHOTTER="fuse-overlayfs"'
             create: true
             state: present
+
