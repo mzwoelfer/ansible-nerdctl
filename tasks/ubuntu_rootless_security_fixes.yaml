@@ -25,7 +25,8 @@
           }
 
     - name: Reload AppArmor
-      ansible.builtin.service:
+      ansible.builtin.systemd_service:
         name: apparmor
         state: restarted
+      changed_when: false
 

@@ -58,11 +58,13 @@
     - nerdctl_rootless
     - ansible_service_mgr == 'systemd'
 
-- name: Enable required SELinux booleans for rootless containers (Fedora/RHEL)
+
+- name: Enable SELinux boolean idempotently
   become: true
-  ansible.builtin.command: "setsebool -P {{ item }} 1"
-  loop:
-    - selinuxuser_execmod
+  ansible.posix.seboolean:
+    name: selinuxuser_execmod
+    state: true
+    persistent: true
   when:
     - ansible_selinux.status == "enabled"
     - ansible_os_family == "RedHat"
