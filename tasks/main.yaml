@@ -3,7 +3,6 @@
 - include_tasks: ubuntu_rootless_security_fixes.yaml
   when: nerdctl_rootless
 
-
 - name: Rootless install
   when: nerdctl_rootless
   block:
