@@ -11,10 +11,11 @@
     - ansible_distribution_version is version('24.04', '>=')
     - rootlesskit_path.stdout.startswith('/usr/local/bin')
   block:
+
     - name: Install AppArmor profile for rootlesskit
       ansible.builtin.copy:
         dest: /etc/apparmor.d/usr.local.bin.rootlesskit
-        mode: "0644"
+        mode: '0644'
         content: |
           abi <abi/4.0>,
           include <tunables/global>
@@ -29,3 +30,4 @@
         name: apparmor
         state: restarted
       changed_when: false
+

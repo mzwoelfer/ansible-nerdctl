@@ -6,7 +6,7 @@ dependency:
   options:
     ignore-errors: true
 
-driver:
+driver: 
   name: default
 
 platforms:

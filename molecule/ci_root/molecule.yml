@@ -6,7 +6,7 @@ dependency:
   options:
     ignore-errors: true
 
-driver:
+driver: 
   name: docker
 
 platforms:
@@ -28,3 +28,4 @@ provisioner:
     host_vars:
       "rootful-nerdctl-${MOLECULE_DISTRO:-debian12}":
         ansible_user: root
+
