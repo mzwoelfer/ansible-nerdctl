@@ -17,10 +17,6 @@ galaxy_info:
     - name: Rocky
       versions:
         - '9'
-    - name: Fedora
-      versions:
-        - '41'
-        - '42'
   galaxy_tags:
     - nerdctl
     - containerd
