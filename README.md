@@ -110,7 +110,7 @@ molecule reset -s baremetal_rootful
 
 This clears Molecule’s local working directory — it does not touch your VMs.
 
-## Important Notes on supported operating systems
+## ❗Important Notes on supported operating systems
 ### Why is Rocky10 not supported?
 Rocky Linux 10 removed legacy netfilter kernel modules (e.g., `xt_comment`) required by CNI bridge networking. 
 Rootless nerdctl + containerd can not create network bridges, so containers fail to start. 
@@ -144,6 +144,9 @@ The role detects the installed `rootlesskit` binary and installs a minimal AppAr
 
 This ensures rootless containers using nerdctl + containerd work without AppArmor blocking their user namespaces or filesystem mounts.
 
+## 📚 Sources
+- [Nerdctl GitHub Repository](https://github.com/containerd/nerdctl)
+- [Common steps for rootless containers](https://rootlesscontaine.rs/getting-jstarted/common/)
 
 ## License
 
