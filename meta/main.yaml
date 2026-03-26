@@ -17,7 +17,7 @@ galaxy_info:
         - noble
     - name: Rocky
       versions:
-        - "9"
+        - all
   galaxy_tags:
     - nerdctl
     - containerd
