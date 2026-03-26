@@ -26,7 +26,7 @@
           {% endif %}
 
     - name: Wait for systemd to be ready
-      command: systemctl is-system-running
+      ansible.builtin.command: systemctl is-system-running
       register: systemctl_status
       until: >
         'running' in systemctl_status.stdout or

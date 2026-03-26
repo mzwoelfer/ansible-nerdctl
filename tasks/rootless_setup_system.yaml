@@ -9,7 +9,7 @@
       become: true
 
     - name: Symlink mount.fuse3 into default Debian11 $PATH
-      file:
+      ansible.builtin.file:
         src: /sbin/mount.fuse3
         dest: /usr/local/bin/mount.fuse3
         state: link
@@ -32,7 +32,7 @@
       register: iptables_check
 
     - name: Create symlink for iptables and ip6tables in Debian $PATH
-      file:
+      ansible.builtin.file:
         src: "/usr/sbin/{{ item.item }}"
         dest: "/usr/local/bin/{{ item.item }}"
         state: link

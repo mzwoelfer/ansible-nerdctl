@@ -15,13 +15,13 @@
       become: true
       block:
         - name: Create systemd override directory for user@.service
-          file:
+          ansible.builtin.file:
             path: /etc/systemd/system/user@.service.d
             state: directory
             mode: "0755"
 
         - name: Create delegate.conf to enable cpu, cpuset, io delegation
-          copy:
+          ansible.builtin.copy:
             dest: /etc/systemd/system/user@.service.d/delegate.conf
             content: |
               [Service]
@@ -36,7 +36,7 @@
       become: true
       block:
         - name: Containerd config directory exists
-          file:
+          ansible.builtin.file:
             path: "{{ ansible_env.HOME }}/.config/containerd"
             state: directory
             mode: "0755"
@@ -44,12 +44,12 @@
             group: "{{ ansible_user_gid }}"
 
         - name: Set fuse-overlayfs socket path
-          set_fact:
+          ansible.builtin.set_fact:
             fuse_overlayfs_sock: >-
               "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
 
         - name: Add fuse-overlayfs proxy plugin to containerd config
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ ansible_env.HOME }}/.config/containerd/config.toml"
             block: |
               [proxy_plugins]
@@ -64,7 +64,7 @@
           notify: Restart rootless containerd user service
 
         - name: Set environment variable for fuse-overlayfs snapshotter
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: "{{ ansible_env.HOME }}/.profile"
             line: 'export CONTAINERD_SNAPSHOTTER="fuse-overlayfs"'
             create: true
