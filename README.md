@@ -4,8 +4,8 @@ Install [nerdctl](https://github.com/containerd/nerdctl) - a Docker-compatible C
 
 ## ⭐ Features
 
-- Installs rootless nerdctl + containerd from GitHub releases
-- Installs latest verison by default
+- Install rootless nerdctl + containerd from GitHub releases
+- Install latest verison by default
 - Supports major Long term support distributions:
   - Debian 11/12/13
   - Ubuntu 2204/2404
