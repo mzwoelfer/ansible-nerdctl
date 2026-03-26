@@ -35,6 +35,7 @@
       ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ hello_image }}"
       register: hello_run
       failed_when: hello_run.rc != 0
+      changed_when: false
 
     - name: Show hello-world output (debug)
       ansible.builtin.debug:
@@ -68,6 +69,7 @@
         "{{ nerdctl_bin }} build -t {{ build_image }} {{ build_dir }}"
       register: build_result
       failed_when: build_result.rc != 0
+      changed_when: false
 
     - name: Show build output (debug)
       ansible.builtin.debug:
@@ -77,6 +79,7 @@
       ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ build_image }}"
       register: built_run
       failed_when: built_run.rc != 0
+      changed_when: false
 
     - name: Assert built image printed expected text
       ansible.builtin.assert:
