@@ -7,7 +7,7 @@
     nerdctl_archive_destination: "/tmp/{{ nerdctl_archive }}"
 
   pre_tasks:
-    - name: apt update (on Debian)
+    - name: Apt update (on Debian)
       become: true
       ansible.builtin.apt:
         update_cache: true

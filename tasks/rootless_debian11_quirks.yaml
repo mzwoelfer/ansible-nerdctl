@@ -1,5 +1,5 @@
 ---
-- name: rootless Debian 11 quirks
+- name: Rootless Debian 11 quirks
   when:
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
@@ -11,7 +11,7 @@
       become: true
       become_user: "{{ nerdctl_user }}"
 
-    - name: cgroup controllers are delegated for user services (Debian 11)
+    - name: Cgroup controllers are delegated for user services (Debian 11)
       become: true
       block:
         - name: Create systemd override directory for user@.service
@@ -35,7 +35,7 @@
     - name: Configure rootless fuse-overlayfs for containerd on Debian11
       become: true
       block:
-        - name: containerd config directory exists
+        - name: Containerd config directory exists
           file:
             path: "{{ ansible_env.HOME }}/.config/containerd"
             state: directory
