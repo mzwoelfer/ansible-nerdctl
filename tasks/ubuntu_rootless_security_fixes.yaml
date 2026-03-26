@@ -1,6 +1,6 @@
 ---
 - name: Detect rootlesskit path
-  ansible.builtin.shell: command -v rootlesskit
+  ansible.builtin.command: which rootlesskit
   register: rootlesskit_path
   changed_when: false
 

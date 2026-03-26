@@ -26,6 +26,7 @@
           {% endif %}
 
     - name: Wait for systemd to be ready
+      # noqa: command-instead-of-module
       ansible.builtin.command: systemctl is-system-running
       register: systemctl_status
       until: >
