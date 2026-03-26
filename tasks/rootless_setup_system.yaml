@@ -51,6 +51,7 @@
     state: started
     scope: user
     enabled: true
+  become: true
   become_user: "{{ nerdctl_user }}"
   when:
     - nerdctl_rootless

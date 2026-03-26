@@ -5,6 +5,7 @@
   register: nerdctl_installed_output
   failed_when: false
   changed_when: false
+  become: true
   become_user: "{{ nerdctl_user }}"
 
 # ==========================================================I==
@@ -94,6 +95,7 @@
         dest: "{{ nerdctl_effective_archive_path }}"
         mode: "0755"
         owner: "{{ nerdctl_user }}"
+      become: true
       become_user: "{{ nerdctl_user }}"
       when: nerdctl_needs_update
 

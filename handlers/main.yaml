@@ -11,3 +11,4 @@
     state: restarted
     daemon_reload: true
   become_user: "{{ nerdctl_user }}"
+  become: true
