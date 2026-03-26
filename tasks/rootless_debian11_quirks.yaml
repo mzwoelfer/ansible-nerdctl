@@ -38,7 +38,7 @@
           file:
             path: "{{ ansible_env.HOME }}/.config/containerd"
             state: directory
-            mode: 0755
+            mode: "0755"
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
 
@@ -59,7 +59,7 @@
             create: true
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
-            mode: 0644
+            mode: "0644"
           notify: Restart rootless containerd user service
 
         - name: Set environment variable for fuse-overlayfs snapshotter

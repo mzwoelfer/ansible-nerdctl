@@ -92,7 +92,7 @@
       ansible.builtin.get_url:
         url: "{{ nerdctl_download_url }}"
         dest: "{{ nerdctl_effective_archive_path }}"
-        mode: 0755
+        mode: "0755"
         owner: "{{ nerdctl_user }}"
       become_user: "{{ nerdctl_user }}"
       when: nerdctl_needs_update
