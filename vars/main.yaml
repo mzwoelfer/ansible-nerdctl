@@ -2,6 +2,7 @@ _nerdctl_rootless_packages:
   Debian:
     - uidmap
     - dbus-user-session
+    - iptables
   RedHat:
     - shadow-utils
     - dbus-daemon
