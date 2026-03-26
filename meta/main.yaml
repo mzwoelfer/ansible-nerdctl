@@ -5,7 +5,7 @@ galaxy_info:
   description: Install latest (rootless) Nerdctl from GitHub.
   license: MIT
   min_ansible_version: "2.9"
-  platform:
+  platforms:
     - name: Debian
       versions:
         - bullseye
