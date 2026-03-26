@@ -11,7 +11,8 @@
 
   environment:
     PATH: >-
-      "{{ nerdctl_install_prefix }}/bin:{{ ansible_env.PATH | default('/usr/bin:/bin') }}"
+      "{{ nerdctl_install_prefix }}/bin:{{
+      ansible_env.PATH | default('/usr/bin:/bin') }}"
 
   tasks:
     - name: Check nerdctl is installed
@@ -45,7 +46,8 @@
           - hello_run.stdout is defined
           - "'Hello from' in hello_run.stdout"
         fail_msg: >-
-          "hello-world output did not contain expected greeting. Output: {{ hello_run.stdout | default('') }}"
+          "hello-world output did not contain expected greeting.
+          Output: {{ hello_run.stdout | default('') }}"
 
     - name: Prepare build directory
       ansible.builtin.file:
@@ -82,7 +84,8 @@
           - "built_run.stdout is defined"
           - "'hello-minimal' in built_run.stdout"
         fail_msg: >-
-          "Built image did not produce expected output. Output: {{ built_run.stdout | default('') }}"
+          "Built image did not produce expected output.
+          Output: {{ built_run.stdout | default('') }}"
 
     - name: "Cleanup: remove built image (best-effort)"
       ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ build_image }}"

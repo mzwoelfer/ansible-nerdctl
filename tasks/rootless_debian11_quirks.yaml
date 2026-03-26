@@ -1,3 +1,4 @@
+---
 - name: rootless Debian 11 quirks
   when:
     - ansible_distribution == "Debian"
