@@ -1,7 +1,10 @@
 ---
-- include_tasks: rootless_setup_system.yaml
-- include_tasks: download_and_extract_nerdctl.yaml
-- include_tasks: ubuntu_rootless_security_fixes.yaml
+- name: Include rootless system setup
+  ansible.builtin.include_tasks: rootless_setup_system.yaml
+- name: Include nerdctl download and extract
+  ansible.builtin.include_tasks: download_and_extract_nerdctl.yaml
+- name: Include Ubuntu rootless security fixes
+  ansible.builtin.include_tasks: ubuntu_rootless_security_fixes.yaml
   when: nerdctl_rootless
 
 - name: Rootless install
@@ -12,6 +15,7 @@
       loop:
         - containerd-rootless-setuptool.sh install
         - containerd-rootless-setuptool.sh install-buildkit
+      become: true
       become_user: "{{ nerdctl_user }}"
       changed_when: false
 
@@ -32,7 +36,7 @@
 - name: Enable bash completion
   block:
     - name: Generate nerdctl bash completion script
-      ansible.builtin.shell: "{{ nerdctl_bin }} completion bash"
+      ansible.builtin.command: "{{ nerdctl_bin }} completion bash"
       register: nerdctl_completion
       changed_when: false
 
