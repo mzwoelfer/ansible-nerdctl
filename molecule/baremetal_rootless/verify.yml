@@ -89,17 +89,17 @@
     - name: "Cleanup: remove built image (best-effort)"
       ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ build_image }}"
       register: cleanup1
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: "Cleanup: remove hello-world image (best-effort)"
       ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ hello_image }}"
       register: cleanup2
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: "Cleanup: remove build directory"
       ansible.builtin.file:
         path: "{{ build_dir }}"
         state: absent
-      ignore_errors: true
+      failed_when: false
