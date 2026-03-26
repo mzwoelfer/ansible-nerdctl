@@ -42,6 +42,11 @@
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
 
+        - name: Set fuse-overlayfs socket path
+          set_fact:
+            fuse_overlayfs_sock: >-
+              "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
+
         - name: Add fuse-overlayfs proxy plugin to containerd config
           blockinfile:
             path: "{{ ansible_env.HOME }}/.config/containerd/config.toml"
@@ -49,7 +54,7 @@
               [proxy_plugins]
                 [proxy_plugins."fuse-overlayfs"]
                   type = "snapshot"
-                  address = "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
+                  address = "{{ fuse_overlayfs_sock }}"
             marker: "### BEGIN FUSE OVERLAYFS ###"
             create: true
             owner: "{{ nerdctl_user }}"
