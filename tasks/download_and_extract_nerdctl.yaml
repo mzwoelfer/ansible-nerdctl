@@ -20,7 +20,8 @@
 
     - name: Fail if provided nerdctl archive does not exist
       ansible.builtin.fail:
-        msg: "Provided nerdctl_archive_path does not exist: {{ nerdctl_archive_path }}"
+        msg: >-
+          "Provided nerdctl_archive_path does not exist: {{ nerdctl_archive_path }}"
       when: not nerdctl_archive_stat.stat.exists
 
     - name: Set effective nerdctl archive path (offline)
@@ -38,7 +39,7 @@
   when: nerdctl_archive_path | length == 0
   block:
     - name: Extract installed version
-      set_fact: 
+      set_fact:
         nerdctl_installed_version: "{{ nerdctl_installed_output.stdout | regex_search('[\\d\\.]+') }}"
       when: nerdctl_installed_output.rc == 0
 
@@ -64,7 +65,7 @@
       nerdctl_needs_update: "{{ nerdctl_installed_version is not defined or nerdctl_installed_version != nerdctl_version }}"
 
   - name: Set archive URLs
-    set_fact: 
+    set_fact:
       nerdctl_archive: "nerdctl-full-{{ nerdctl_version }}-linux-amd64.tar.gz"
     when: nerdctl_needs_update
 
@@ -88,7 +89,7 @@
     when: nerdctl_needs_update
 
 # ============================================================
-# EXTRACTION 
+# EXTRACTION
 # ============================================================
 - name: "Extract nerdctl to install prefix: {{ nerdctl_install_prefix }}"
   become: true
@@ -98,4 +99,3 @@
     remote_src: true
   when: nerdctl_needs_update
   notify: Reload systemd units
-
