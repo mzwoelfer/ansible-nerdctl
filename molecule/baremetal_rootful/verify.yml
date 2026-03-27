@@ -3,14 +3,16 @@
   hosts: all
   become: true
   vars:
-    nerdctl_install_prefix : "/usr/local"
-    nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl" # <-- Set in defaults/main.yaml
+    nerdctl_install_prefix: "/usr/local"
+    nerdctl_bin: "{{ nerdctl_install_prefix }}/bin/nerdctl"
     build_dir: "/tmp/molecule-nerdctl-build-{{ inventory_hostname }}"
     build_image: "molecule-test/minimal:latest"
     hello_image: "docker.io/library/hello-world:latest"
 
   environment:
-    PATH: "{{ nerdctl_install_prefix }}/bin:{{ ansible_env.PATH | default('/usr/bin:/bin') }}"
+    PATH: >-
+      "{{ nerdctl_install_prefix }}/bin:{{
+      ansible_env.PATH | default('/usr/bin:/bin') }}"
 
   tasks:
     - name: Check nerdctl is installed
@@ -33,6 +35,7 @@
       ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ hello_image }}"
       register: hello_run
       failed_when: hello_run.rc != 0
+      changed_when: false
 
     - name: Show hello-world output (debug)
       ansible.builtin.debug:
@@ -43,13 +46,15 @@
         that:
           - hello_run.stdout is defined
           - "'Hello from' in hello_run.stdout"
-        fail_msg: "hello-world output did not contain expected greeting. Output: {{ hello_run.stdout | default('') }}"
+        fail_msg: >-
+          "hello-world output did not contain expected greeting.
+          Output: {{ hello_run.stdout | default('') }}"
 
     - name: Prepare build directory
       ansible.builtin.file:
         path: "{{ build_dir }}"
         state: directory
-        mode: '0755'
+        mode: "0755"
 
     - name: Write minimal Dockerfile for build test
       ansible.builtin.copy:
@@ -57,12 +62,14 @@
         content: |
           FROM busybox
           CMD echo hello-minimal
-        mode: '0644'
+        mode: "0644"
 
     - name: Build minimal image with nerdctl
-      ansible.builtin.command: "{{ nerdctl_bin }} build -t {{ build_image }} {{ build_dir }}"
+      ansible.builtin.command: >-
+        "{{ nerdctl_bin }} build -t {{ build_image }} {{ build_dir }}"
       register: build_result
       failed_when: build_result.rc != 0
+      changed_when: false
 
     - name: Show build output (debug)
       ansible.builtin.debug:
@@ -72,28 +79,31 @@
       ansible.builtin.command: "{{ nerdctl_bin }} run --rm {{ build_image }}"
       register: built_run
       failed_when: built_run.rc != 0
+      changed_when: false
 
     - name: Assert built image printed expected text
       ansible.builtin.assert:
         that:
           - "built_run.stdout is defined"
           - "'hello-minimal' in built_run.stdout"
-        fail_msg: "Built image did not produce expected output. Output: {{ built_run.stdout | default('') }}"
+        fail_msg: >-
+          "Built image did not produce expected output.
+          Output: {{ built_run.stdout | default('') }}"
 
     - name: "Cleanup: remove built image (best-effort)"
       ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ build_image }}"
       register: cleanup1
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: "Cleanup: remove hello-world image (best-effort)"
       ansible.builtin.command: "{{ nerdctl_bin }} rmi {{ hello_image }}"
       register: cleanup2
-      ignore_errors: true
+      failed_when: false
       changed_when: false
 
     - name: "Cleanup: remove build directory"
       ansible.builtin.file:
         path: "{{ build_dir }}"
         state: absent
-      ignore_errors: true
+      failed_when: false

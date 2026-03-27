@@ -6,11 +6,11 @@ dependency:
   options:
     ignore-errors: true
 
-driver: 
+driver:
   name: default
 
 platforms:
-  - name: baremetal-vm-1
+  - name: Baremetal-vm-1
 
 provisioner:
   name: ansible

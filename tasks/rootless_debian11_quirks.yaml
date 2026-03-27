@@ -1,30 +1,33 @@
-- name: rootless Debian 11 quirks
+---
+- name: Rootless Debian 11 quirks
   when:
     - ansible_distribution == "Debian"
     - ansible_distribution_major_version == "11"
     - nerdctl_rootless
-  block: 
+  block:
     - name: Install fuse-overlayfs for Debian11 as non-root user
       ansible.builtin.command:
         cmd: containerd-rootless-setuptool.sh install-fuse-overlayfs
+      become: true
       become_user: "{{ nerdctl_user }}"
+      changed_when: true # always installs, idempotency handled by the script
 
-    - name: Ensure cgroup controllers are delegated for user services (Debian 11)
+    - name: Cgroup controllers are delegated for user services (Debian 11)
       become: true
       block:
         - name: Create systemd override directory for user@.service
-          file:
+          ansible.builtin.file:
             path: /etc/systemd/system/user@.service.d
             state: directory
-            mode: '0755'
+            mode: "0755"
 
         - name: Create delegate.conf to enable cpu, cpuset, io delegation
-          copy:
+          ansible.builtin.copy:
             dest: /etc/systemd/system/user@.service.d/delegate.conf
             content: |
               [Service]
               Delegate=cpu cpuset io memory pids
-            mode: '0644'
+            mode: "0644"
 
         - name: Reload systemd daemon to apply new cgroup delegation
           ansible.builtin.systemd_service:
@@ -33,32 +36,38 @@
     - name: Configure rootless fuse-overlayfs for containerd on Debian11
       become: true
       block:
-        - name: containerd config directory exists
-          file:
+        - name: Containerd config directory exists
+          ansible.builtin.file:
             path: "{{ ansible_env.HOME }}/.config/containerd"
             state: directory
-            mode: 0755
+            mode: "0755"
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
 
+        - name: Set fuse-overlayfs socket path
+          ansible.builtin.set_fact:
+            fuse_overlayfs_sock: >-
+              "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
+
         - name: Add fuse-overlayfs proxy plugin to containerd config
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ ansible_env.HOME }}/.config/containerd/config.toml"
             block: |
               [proxy_plugins]
                 [proxy_plugins."fuse-overlayfs"]
                   type = "snapshot"
-                  address = "/run/user/{{ ansible_user_uid }}/containerd-fuse-overlayfs.sock"
+                  address = "{{ fuse_overlayfs_sock }}"
             marker: "### BEGIN FUSE OVERLAYFS ###"
-            create: yes
+            create: true
             owner: "{{ nerdctl_user }}"
             group: "{{ ansible_user_gid }}"
-            mode: 0644
+            mode: "0644"
           notify: Restart rootless containerd user service
 
         - name: Set environment variable for fuse-overlayfs snapshotter
-          lineinfile:
+          ansible.builtin.lineinfile:
             path: "{{ ansible_env.HOME }}/.profile"
             line: 'export CONTAINERD_SNAPSHOTTER="fuse-overlayfs"'
             create: true
             state: present
+            mode: "0644"

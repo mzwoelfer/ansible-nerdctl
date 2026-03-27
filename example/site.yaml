@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- name: Install nerdctl
+  hosts: all
   roles:
     - role: ansible_nerdctl
