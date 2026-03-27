@@ -22,8 +22,8 @@
     - name: Fail if provided nerdctl archive does not exist
       ansible.builtin.fail:
         msg: >-
-          "Provided nerdctl_archive_path does not exist:
-          {{ nerdctl_archive_path }}"
+          Provided nerdctl_archive_path does not exist:
+          {{ nerdctl_archive_path }}
       when: not nerdctl_archive_stat.stat.exists
 
     - name: Set effective nerdctl archive path (offline)
@@ -43,8 +43,8 @@
     - name: Extract installed version
       ansible.builtin.set_fact:
         nerdctl_installed_version: >-
-          "{{ nerdctl_installed_output.stdout |
-          regex_search('[\\d\\.]+') }}"
+          {{ nerdctl_installed_output.stdout |
+          regex_search('[\\d\\.]+') }}
       when: nerdctl_installed_output.rc == 0
 
     - name: Check latest nerdctl version from github
@@ -62,15 +62,15 @@
         - name: Set latest available nerdctl version
           ansible.builtin.set_fact:
             nerdctl_version: >-
-              "{{ (response.location |
-              regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}"
+              {{ (response.location |
+              regex_search('tag/v?([0-9.]+)$', '\\1') | first) }}
           when: nerdctl_version == "latest"
 
     - name: Determine if nerdctl needs update
       ansible.builtin.set_fact:
         nerdctl_needs_update: >-
-          "{{ nerdctl_installed_version is not defined or
-          nerdctl_installed_version != nerdctl_version }}"
+          {{ nerdctl_installed_version is not defined or
+          nerdctl_installed_version != nerdctl_version }}
 
     - name: Set archive URLs
       ansible.builtin.set_fact:
@@ -80,8 +80,8 @@
     - name: Set nerdctl download URL
       ansible.builtin.set_fact:
         nerdctl_download_url: >-
-          "https://github.com/containerd/nerdctl/releases/download/v{{
-          nerdctl_version }}/{{ nerdctl_archive }}"
+          https://github.com/containerd/nerdctl/releases/download/v{{
+          nerdctl_version }}/{{ nerdctl_archive }}
       when: nerdctl_needs_update
 
     - name: Set archive path for extraction
